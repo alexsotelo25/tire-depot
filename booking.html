@@ -1,0 +1,237 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tire Depot — Book Your Bay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,600;0,800;0,900;1,800;1,900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#09090a;--ink-2:#101012;--panel:#151517;--panel-2:#1c1c1f;
+    --line:#2a2a2f;--line-2:#3a3a41;--white:#f6f5f2;--steel:#c9ccd2;--muted:#8d8d95;--muted-2:#5c5c64;
+    --red:#e8121b;--red-hot:#ff3a34;--green:#2fbf6b;--amber:#ffb020;
+    --disp:"Kanit",-apple-system,sans-serif;--mono:"Roboto Mono",ui-monospace,Menlo,monospace;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color-scheme:dark;
+  }
+  *{box-sizing:border-box}html,body{margin:0;padding:0}
+  body{background:var(--ink);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+  a{color:inherit;text-decoration:none}.mono{font-family:var(--mono)}
+  .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(60% 55% at 82% 0%,rgba(232,18,27,.16),transparent 60%),var(--ink)}
+  .bg .asphalt{position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")}
+
+  .speed{display:inline-flex;flex-direction:column;gap:3px;flex:none}
+  .speed i{height:3px;background:var(--red);display:block;border-radius:2px}
+  .speed i:nth-child(1){width:26px}.speed i:nth-child(2){width:18px;opacity:.7}.speed i:nth-child(3){width:10px;opacity:.4}
+
+  nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+    padding:15px clamp(16px,3.5vw,40px);background:rgba(9,9,10,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .wordmark{font-family:var(--disp);font-weight:900;font-style:italic;font-size:24px;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;display:inline-flex;align-items:center;transform:skewX(-2deg)}
+  .wordmark .d{color:#fff;background:var(--red);padding:2px 8px 2px 7px;margin-left:6px;clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
+  .back{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+  .back:hover{color:var(--white)}
+
+  .btn{cursor:pointer;border:0;font-family:var(--disp);font-weight:800;font-style:italic;letter-spacing:.02em;text-transform:uppercase;font-size:14px;
+    padding:12px 22px;border-radius:3px;transition:transform .14s,background .18s,box-shadow .18s;display:inline-flex;align-items:center;gap:9px;transform:skewX(-6deg)}
+  .btn>*{transform:skewX(6deg);display:inline-flex;align-items:center;gap:9px}
+  .btn:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+  .btn-red{background:var(--red);color:#fff;box-shadow:0 8px 24px -10px var(--red)}
+  .btn-red:hover{background:var(--red-hot);transform:skewX(-6deg) translateY(-2px)}
+  .btn.locked{background:var(--panel-2);color:var(--muted-2);box-shadow:none;cursor:not-allowed}
+
+  .head{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:clamp(30px,5vw,56px) clamp(16px,3.5vw,40px) 8px}
+  .eb{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:600}
+  h1{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(34px,5.4vw,62px);line-height:.9;letter-spacing:-.02em;margin:12px 0 0}
+  .head p{color:var(--muted);font-size:16px;margin:12px 0 0;max-width:54ch}
+
+  .wrap{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:26px clamp(16px,3.5vw,40px) 70px}
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+
+  .card{background:linear-gradient(180deg,var(--panel-2),var(--ink-2));border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .card-h{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px}
+  .card-h .n{width:22px;height:22px;border-radius:5px;background:var(--red);color:#fff;font-family:var(--mono);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+  .card-h h2{font-family:var(--disp);font-style:italic;font-weight:800;text-transform:uppercase;font-size:17px;margin:0;letter-spacing:.01em}
+  .card-b{padding:20px}
+
+  .days{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px;min-width:0}
+  .days::-webkit-scrollbar{height:6px}.days::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:10px}
+  .day{flex:none;cursor:pointer;width:74px;background:var(--ink);border:1.5px solid var(--line);border-radius:11px;padding:12px 0 10px;text-align:center;transition:transform .16s,border-color .16s,background .16s;position:relative}
+  .day:hover{transform:translateY(-3px);border-color:var(--line-2)}
+  .day.on{border-color:var(--red);background:linear-gradient(180deg,rgba(232,18,27,.14),rgba(232,18,27,.03))}
+  .day .dow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .day.on .dow{color:var(--red)}
+  .day .dnum{font-family:var(--disp);font-style:italic;font-weight:800;font-size:23px;margin-top:2px;line-height:1}
+  .day .dmo{font-family:var(--mono);font-size:10px;color:var(--muted-2);text-transform:uppercase;margin-top:3px}
+  .day .av{font-family:var(--mono);font-size:10px;margin-top:7px;color:var(--green)}
+  .day.full .av{color:var(--muted-2)}
+  .day .today{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:100px;text-transform:uppercase}
+
+  .lbl{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:500;margin:22px 0 12px;display:flex;align-items:center;gap:9px}
+  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+  .snote{grid-column:1/-1;font-family:var(--mono);font-size:12px;color:var(--muted-2);display:flex;align-items:center;gap:8px;padding-bottom:2px}
+  .snote::before,.snote::after{content:"";flex:1;height:1px;background:var(--line)}
+  .slot{background:var(--ink);border:1.5px solid var(--line);border-radius:11px;padding:12px 13px}
+  .slot-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .slot-t{font-family:var(--mono);font-size:15px;font-weight:700}
+  .slot-s{font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 7px;border-radius:100px;text-transform:uppercase}
+  .s2{background:rgba(47,191,107,.14);color:#7ee2a6}.s1{background:rgba(255,176,32,.14);color:var(--amber)}.s0{background:rgba(255,58,52,.12);color:#ff8a8e}
+  .bays{display:flex;gap:7px}
+  .bay{flex:1;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;text-align:center;padding:9px 4px;border-radius:8px;border:1.5px solid var(--line-2);color:var(--muted);background:var(--ink-2);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px}
+  .bay .d{width:6px;height:6px;border-radius:50%;background:var(--green)}
+  .bay.open:hover{border-color:var(--red);color:var(--white);transform:translateY(-1px)}
+  .bay.sel{background:var(--red);color:#fff;border-color:var(--red)}.bay.sel .d{background:#fff}
+  .bay.taken{cursor:not-allowed;color:var(--muted-2);opacity:.5;text-decoration:line-through}.bay.taken .d{background:var(--muted-2)}
+
+  /* summary */
+  .sum{display:flex;flex-direction:column;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:11px;overflow:hidden;margin-bottom:16px}
+  .srow{background:var(--ink-2);padding:13px 15px;display:flex;align-items:center;gap:12px}
+  .srow .ic{width:28px;height:28px;border-radius:7px;background:var(--panel);display:flex;align-items:center;justify-content:center;flex:none;color:var(--muted)}
+  .srow.done .ic{background:rgba(232,18,27,.14);color:var(--red)}
+  .srow .k{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-2)}
+  .srow .v{font-size:14px;font-weight:600;margin-top:1px}.srow .v.empty{color:var(--muted-2);font-weight:500}
+  .form{display:flex;flex-direction:column;gap:11px}
+  .form.dim{opacity:.4;pointer-events:none}
+  .field label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;margin-bottom:6px}
+  .field input{width:100%;background:var(--ink);border:1.5px solid var(--line-2);color:var(--white);border-radius:9px;padding:12px 13px;font-size:15px;font-family:var(--sans)}
+  .field input::placeholder{color:var(--muted-2)}
+  .field input:focus{outline:none;border-color:var(--red)}
+  .cta{width:100%;justify-content:center;font-size:15px;padding:15px;margin-top:4px}
+  .fine{font-family:var(--mono);font-size:11px;color:var(--muted-2);text-align:center;margin-top:10px;line-height:1.5}
+
+  .success{display:none;flex-direction:column;align-items:center;text-align:center;padding:14px 6px}
+  .success.show{display:flex}
+  .check{width:60px;height:60px;border-radius:50%;background:rgba(47,191,107,.12);border:1.5px solid rgba(47,191,107,.4);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .check svg{stroke:var(--green)}
+  .success h3{font-family:var(--disp);font-style:italic;font-weight:900;text-transform:uppercase;font-size:22px;margin:0 0 6px}
+  .success p{color:var(--muted);font-size:14px;margin:0}
+  .ref{margin:16px 0;background:var(--ink);border:1px dashed var(--line-2);border-radius:10px;padding:12px 16px;width:100%}
+  .ref .k{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-2)}
+  .ref .code{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--red);letter-spacing:.04em;margin-top:2px}
+  .ghost{cursor:pointer;background:transparent;border:1.5px solid var(--line-2);color:var(--white);border-radius:9px;padding:11px 16px;font-family:var(--disp);font-style:italic;font-weight:800;text-transform:uppercase;font-size:13px;width:100%}
+  .ghost:hover{border-color:var(--red);color:var(--red)}
+  .demo{position:relative;z-index:2;text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--muted-2);padding:0 20px 40px}
+  .demo a{color:var(--red)}
+</style>
+
+<div class="bg"><div class="asphalt"></div></div>
+
+<nav>
+  <a href="index.html" class="wordmark"><span>Tire</span><span class="d">Depot</span></a>
+  <a href="index.html" class="back">← Back to site</a>
+</nav>
+
+<div class="head">
+  <div class="eb"><span class="speed"><i></i><i></i><i></i></span> Book a bay</div>
+  <h1>Grab your<br>one-hour slot.</h1>
+  <p>Two bays · every service one hour · Mon–Sat, 8AM–6PM. Pick a day and an open bay — you're locked in and in-and-out fast.</p>
+</div>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- pick -->
+    <div class="card">
+      <div class="card-h"><span class="n">1</span><h2>Pick a day &amp; open bay</h2></div>
+      <div class="card-b">
+        <div class="days" id="days"></div>
+        <div class="lbl"><span class="speed"><i></i><i></i><i></i></span> Open one-hour slots</div>
+        <div class="slots" id="slots"></div>
+      </div>
+    </div>
+
+    <!-- summary/form -->
+    <div class="card">
+      <div class="card-h"><span class="n">2</span><h2>Your appointment</h2></div>
+      <div class="card-b">
+        <div id="main">
+          <div class="sum">
+            <div class="srow" id="sDay"><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M8 2.5v4M16 2.5v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><div><div class="k">Day</div><div class="v empty" id="vDay">Select a day</div></div></div>
+            <div class="srow" id="sTime"><span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><div><div class="k">Time &amp; bay</div><div class="v empty" id="vTime">Select a slot</div></div></div>
+          </div>
+          <div class="form dim" id="form">
+            <div class="field"><label for="fName">Name / company</label><input id="fName" placeholder="Driver or fleet name" autocomplete="name"></div>
+            <div class="field"><label for="fPhone">Phone</label><input id="fPhone" placeholder="(915) 000-0000" inputmode="tel" autocomplete="tel"></div>
+            <div class="field"><label for="fRig">Rig / tire <span style="color:var(--muted-2);text-transform:none;letter-spacing:0">(optional)</span></label><input id="fRig" placeholder="Freightliner · 53' reefer"></div>
+            <div class="field"><label for="fNote">What do you need? <span style="color:var(--muted-2);text-transform:none;letter-spacing:0">(optional)</span></label><input id="fNote" placeholder="2 used drives · patch a flat"></div>
+            <button class="btn btn-red cta locked" id="cta" onclick="confirmB()"><span>Select a bay first</span></button>
+            <div class="fine">No payment now — pay at the shop. We'll hold your bay.</div>
+          </div>
+        </div>
+        <div class="success" id="success">
+          <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5 11-11" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>You're booked</h3>
+          <p id="sLine">Bay held — see you then.</p>
+          <div class="ref"><div class="k">Confirmation</div><div class="code" id="sRef">TD-0000</div></div>
+          <button class="ghost" onclick="resetB()">Book another bay</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="demo">Live demo · bookings save to this browser. <a href="#" onclick="wipeB();return false">Clear demo data</a> · Real availability &amp; reminders wired on build.</div>
+
+<script>
+(function(){
+  var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var OPEN=8,CLOSE=18,sel={di:0,hour:null,bay:null};
+  function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+  function load(){try{return JSON.parse(localStorage.getItem('td_book')||'{}');}catch(e){return{};}}
+  function save(o){localStorage.setItem('td_book',JSON.stringify(o));}
+  function h12(h){return{n:((h%12)||12),ap:(h>=12?'PM':'AM')};}
+  function fmtHour(h){var x=h12(h);return x.n+":00 "+x.ap;}
+  var days=[],d=new Date(),g=0;
+  while(days.length<7&&g<20){if(d.getDay()!==0)days.push(new Date(d));d=new Date(d.getTime()+86400000);g++;}
+  function taken(dk,h,b){var s=load();return !!(s[dk]&&s[dk][h]&&s[dk][h][b]);}
+  function openCount(dk,h){return(taken(dk,h,1)?0:1)+(taken(dk,h,2)?0:1);}
+  function isPast(dd,h){var n=new Date();return dd.toDateString()===n.toDateString()&&h<=n.getHours();}
+  function dayOpen(dd){var dk=key(dd),t=0;for(var h=OPEN;h<CLOSE;h++){if(!isPast(dd,h))t+=openCount(dk,h);}return t;}
+
+  function renderDays(){var w=document.getElementById('days');w.innerHTML='';
+    days.forEach(function(dd,i){var o=dayOpen(dd),el=document.createElement('div');
+      el.className='day'+(i===sel.di?' on':'')+(o===0?' full':'');
+      el.innerHTML=(i===0?'<span class="today">Today</span>':'')+'<div class="dow">'+DOW[dd.getDay()]+'</div><div class="dnum">'+dd.getDate()+'</div><div class="dmo">'+MON[dd.getMonth()]+'</div><div class="av">'+(o===0?'Full':o+' open')+'</div>';
+      el.onclick=function(){sel.di=i;sel.hour=null;sel.bay=null;renderDays();renderSlots();sync();};
+      w.appendChild(el);});
+  }
+  function renderSlots(){var w=document.getElementById('slots');w.innerHTML='';
+    var dd=days[sel.di],dk=key(dd),past=0,shown=0;
+    for(var hp=OPEN;hp<CLOSE;hp++){if(isPast(dd,hp))past++;}
+    if(past>0){var nt=document.createElement('div');nt.className='snote';nt.textContent=past+' earlier '+(past===1?'slot':'slots')+' passed today';w.appendChild(nt);}
+    for(var h=OPEN;h<CLOSE;h++){if(isPast(dd,h))continue;shown++;
+      var oc=openCount(dk,h),slot=document.createElement('div');slot.className='slot';
+      var sc=oc===2?'s2':oc===1?'s1':'s0',st=oc===2?'2 open':oc===1?'1 left':'Full',bays='';
+      [1,2].forEach(function(b){var tk=taken(dk,h,b),isS=(sel.hour===h&&sel.bay===b);
+        bays+='<div class="bay '+(tk?'taken':'open')+(isS?' sel':'')+'" data-h="'+h+'" data-b="'+b+'" '+(tk?'':'role="button" tabindex="0"')+'><span class="d"></span>Bay '+b+'</div>';});
+      slot.innerHTML='<div class="slot-h"><span class="slot-t">'+fmtHour(h)+'</span><span class="slot-s '+sc+'">'+st+'</span></div><div class="bays">'+bays+'</div>';
+      w.appendChild(slot);}
+    if(shown===0){var ns=document.createElement('div');ns.className='snote';ns.textContent='No more slots today — pick another day';w.appendChild(ns);}
+    w.querySelectorAll('.bay.open').forEach(function(b){var go=function(){pick(+b.dataset.h,+b.dataset.b);};b.onclick=go;b.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};});
+  }
+  function pick(h,b){sel.hour=h;sel.bay=b;document.querySelectorAll('.bay').forEach(function(x){x.classList.remove('sel');});var n=document.querySelector('.bay[data-h="'+h+'"][data-b="'+b+'"]');if(n)n.classList.add('sel');sync();}
+  function sync(){var dd=days[sel.di],vd=document.getElementById('vDay');
+    vd.textContent=DOW[dd.getDay()]+', '+MON[dd.getMonth()]+' '+dd.getDate();vd.classList.remove('empty');document.getElementById('sDay').classList.add('done');
+    var vt=document.getElementById('vTime'),cta=document.getElementById('cta');
+    if(sel.hour!==null){vt.textContent=fmtHour(sel.hour)+' · Bay '+sel.bay;vt.classList.remove('empty');document.getElementById('sTime').classList.add('done');
+      document.getElementById('form').classList.remove('dim');cta.classList.remove('locked');cta.querySelector('span').textContent='Confirm booking →';}
+    else{vt.textContent='Select a slot';vt.classList.add('empty');document.getElementById('sTime').classList.remove('done');
+      document.getElementById('form').classList.add('dim');cta.classList.add('locked');cta.querySelector('span').textContent='Select a bay first';}
+  }
+  window.confirmB=function(){if(sel.hour===null)return;
+    var nm=document.getElementById('fName').value.trim(),ph=document.getElementById('fPhone').value.trim();
+    function flash(id){var e=document.getElementById(id);e.focus();e.style.borderColor='var(--red-hot)';setTimeout(function(){e.style.borderColor='';},1200);}
+    if(!nm){flash('fName');return;}if(!ph){flash('fPhone');return;}
+    var dd=days[sel.di],dk=key(dd),s=load();s[dk]=s[dk]||{};s[dk][sel.hour]=s[dk][sel.hour]||{};
+    if(s[dk][sel.hour][sel.bay]){renderSlots();sync();return;}
+    s[dk][sel.hour][sel.bay]={name:nm,phone:ph,rig:document.getElementById('fRig').value.trim(),note:document.getElementById('fNote').value.trim()};save(s);
+    var ref='TD-'+String((sel.di*1000+sel.hour*10+sel.bay)+dd.getDate()*7).padStart(4,'0');
+    document.getElementById('sRef').textContent=ref;
+    document.getElementById('sLine').textContent=DOW[dd.getDay()]+' '+MON[dd.getMonth()]+' '+dd.getDate()+' · '+fmtHour(sel.hour)+' · Bay '+sel.bay;
+    document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
+    sel.hour=null;sel.bay=null;renderDays();renderSlots();
+  };
+  window.resetB=function(){['fName','fPhone','fRig','fNote'].forEach(function(id){document.getElementById(id).value='';});
+    sel.hour=null;sel.bay=null;document.getElementById('success').classList.remove('show');document.getElementById('main').style.display='';renderDays();renderSlots();sync();};
+  window.wipeB=function(){localStorage.removeItem('td_book');sel={di:0,hour:null,bay:null};document.getElementById('success').classList.remove('show');document.getElementById('main').style.display='';renderDays();renderSlots();sync();};
+  renderDays();renderSlots();sync();
+})();
+</script>

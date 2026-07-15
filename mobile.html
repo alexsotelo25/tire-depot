@@ -1,0 +1,226 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tire Depot — Mobile Service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,600;0,800;0,900;1,800;1,900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#09090a;--ink-2:#101012;--panel:#151517;--panel-2:#1c1c1f;
+    --line:#2a2a2f;--line-2:#3a3a41;--white:#f6f5f2;--steel:#c9ccd2;--muted:#8d8d95;--muted-2:#5c5c64;
+    --red:#e8121b;--red-hot:#ff3a34;--green:#2fbf6b;--amber:#ffb020;
+    --disp:"Kanit",-apple-system,sans-serif;--mono:"Roboto Mono",ui-monospace,Menlo,monospace;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color-scheme:dark;
+  }
+  *{box-sizing:border-box}html,body{margin:0;padding:0}
+  body{background:var(--ink);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}}
+  a{color:inherit;text-decoration:none}.mono{font-family:var(--mono)}
+  .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(60% 55% at 82% 0%,rgba(232,18,27,.16),transparent 60%),var(--ink)}
+  .bg .asphalt{position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")}
+
+  .speed{display:inline-flex;flex-direction:column;gap:3px;flex:none}
+  .speed i{height:3px;background:var(--red);display:block;border-radius:2px}
+  .speed i:nth-child(1){width:26px}.speed i:nth-child(2){width:18px;opacity:.7}.speed i:nth-child(3){width:10px;opacity:.4}
+
+  nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:15px clamp(16px,3.5vw,40px);background:rgba(9,9,10,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .wordmark{font-family:var(--disp);font-weight:900;font-style:italic;font-size:24px;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;display:inline-flex;align-items:center;transform:skewX(-2deg)}
+  .wordmark .d{color:#fff;background:var(--red);padding:2px 8px 2px 7px;margin-left:6px;clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
+  .back{font-family:var(--mono);font-size:12px;color:var(--muted)}.back:hover{color:var(--white)}
+
+  .btn{cursor:pointer;border:0;font-family:var(--disp);font-weight:800;font-style:italic;letter-spacing:.02em;text-transform:uppercase;font-size:14px;padding:12px 22px;border-radius:3px;transition:transform .14s,background .18s,box-shadow .18s;display:inline-flex;align-items:center;gap:9px;transform:skewX(-6deg)}
+  .btn>*{transform:skewX(6deg);display:inline-flex;align-items:center;gap:9px}
+  .btn:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+  .btn-red{background:var(--red);color:#fff;box-shadow:0 8px 24px -10px var(--red)}
+  .btn-red:hover{background:var(--red-hot);transform:skewX(-6deg) translateY(-2px)}
+  .btn.locked{background:var(--panel-2);color:var(--muted-2);box-shadow:none;cursor:not-allowed}
+
+  .head{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:clamp(30px,5vw,56px) clamp(16px,3.5vw,40px) 8px}
+  .eb{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:600}
+  h1{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(34px,5.4vw,62px);line-height:.9;letter-spacing:-.02em;margin:12px 0 0}
+  h1 .r{color:var(--red)}
+  .head p{color:var(--muted);font-size:16px;margin:12px 0 0;max-width:56ch}
+
+  .wrap{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:26px clamp(16px,3.5vw,40px) 70px}
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+  @media(max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel-2),var(--ink-2));border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .card-h{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px}
+  .card-h .n{width:22px;height:22px;border-radius:5px;background:var(--red);color:#fff;font-family:var(--mono);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+  .card-h h2{font-family:var(--disp);font-style:italic;font-weight:800;text-transform:uppercase;font-size:17px;margin:0}
+  .card-b{padding:20px}
+
+  .field{margin-bottom:15px}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;margin-bottom:7px}
+  .field label .opt{color:var(--muted-2);text-transform:none;letter-spacing:0}
+  .field input,.field select,.field textarea{width:100%;background:var(--ink);border:1.5px solid var(--line-2);color:var(--white);border-radius:9px;padding:12px 13px;font-size:15px;font-family:var(--sans)}
+  .field textarea{resize:vertical;min-height:70px}
+  .field input::placeholder,.field textarea::placeholder{color:var(--muted-2)}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--red)}
+  .selwrap{position:relative}
+  .selwrap::after{content:"";position:absolute;right:15px;top:50%;width:8px;height:8px;border-right:2px solid var(--steel);border-bottom:2px solid var(--steel);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+  select{appearance:none;cursor:pointer}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:480px){.two{grid-template-columns:1fr}}
+
+  .rangebox{margin-top:14px;border-radius:10px;padding:14px 16px;display:none;align-items:center;gap:12px;font-size:14px}
+  .rangebox.show{display:flex}
+  .rangebox.ok{background:rgba(47,191,107,.1);border:1px solid rgba(47,191,107,.3)}
+  .rangebox.no{background:rgba(255,58,52,.09);border:1px solid rgba(255,58,52,.32)}
+  .rangebox .ic{flex:none}
+  .rangebox .t b{display:block;font-family:var(--mono);font-size:13px}
+  .rangebox.ok .t b{color:#7ee2a6}.rangebox.no .t b{color:#ff8a8e}
+  .rangebox .t span{color:var(--muted);font-size:12.5px}
+  .rangebox.no .t a{color:var(--red);font-weight:600}
+  .form2{margin-top:6px}
+  .form2.dim{opacity:.4;pointer-events:none;filter:saturate(.6)}
+
+  /* right: dispatch summary */
+  .dispatch .drow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .dispatch .drow:first-child{padding-top:0}
+  .dispatch .drow .k{color:var(--muted);font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  .dispatch .drow .v{font-weight:600;font-family:var(--mono)}
+  .dispatch .drow .v.g{color:var(--green)}
+  .deposit{margin-top:16px;background:linear-gradient(100deg,rgba(232,18,27,.12),rgba(232,18,27,.03));border:1px solid rgba(232,18,27,.3);border-radius:11px;padding:16px}
+  .deposit .row{display:flex;justify-content:space-between;align-items:baseline}
+  .deposit .lbl{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--steel)}
+  .deposit .amt{font-family:var(--disp);font-style:italic;font-weight:900;font-size:34px;color:#fff;line-height:1}
+  .deposit .sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .cta{width:100%;justify-content:center;font-size:15px;padding:16px;margin-top:16px}
+  .fine{font-family:var(--mono);font-size:11px;color:var(--muted-2);text-align:center;margin-top:10px;line-height:1.5}
+  .sqr{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--muted-2);margin-top:10px}
+
+  .success{display:none;flex-direction:column;align-items:center;text-align:center;padding:14px 6px}
+  .success.show{display:flex}
+  .check{width:60px;height:60px;border-radius:50%;background:rgba(47,191,107,.12);border:1.5px solid rgba(47,191,107,.4);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .check svg{stroke:var(--green)}
+  .success h3{font-family:var(--disp);font-style:italic;font-weight:900;text-transform:uppercase;font-size:22px;margin:0 0 6px}
+  .success p{color:var(--muted);font-size:14px;margin:0}
+  .ref{margin:16px 0;background:var(--ink);border:1px dashed var(--line-2);border-radius:10px;padding:12px 16px;width:100%}
+  .ref .k{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-2)}
+  .ref .code{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--red);letter-spacing:.04em;margin-top:2px}
+  .demo{position:relative;z-index:2;text-align:center;font-family:var(--mono);font-size:11.5px;color:var(--muted-2);padding:0 20px 40px}
+</style>
+
+<div class="bg"><div class="asphalt"></div></div>
+
+<nav>
+  <a href="index.html" class="wordmark"><span>Tire</span><span class="d">Depot</span></a>
+  <a href="index.html" class="back">← Back to site</a>
+</nav>
+
+<div class="head">
+  <div class="eb"><span class="speed"><i></i><i></i><i></i></span> Mobile service · can't stop?</div>
+  <h1>We come <span class="r">to you.</span></h1>
+  <p>Roadside or at the yard, within <b style="color:var(--white)">60 miles</b> of the shop. Tell us where the rig is and what it needs — a <b style="color:var(--white)">$50 deposit</b> locks your dispatch, the rest is charged at site or at the shop.</p>
+</div>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- form -->
+    <div class="card">
+      <div class="card-h"><span class="n">1</span><h2>Where's the rig?</h2></div>
+      <div class="card-b">
+        <div class="field">
+          <label for="loc">Nearest town / area</label>
+          <div class="selwrap"><select id="loc">
+            <option value="">Pick where the rig is…</option>
+          </select></div>
+        </div>
+        <div class="field">
+          <label for="addr">Exact location <span class="opt">(address, mile marker, or yard)</span></label>
+          <input id="addr" placeholder="I-10 EB mile 34 · or 1600 Yard Rd">
+        </div>
+        <div class="rangebox" id="range"><span class="ic" id="rangeIc"></span><div class="t" id="rangeT"></div></div>
+
+        <div class="form2 dim" id="form2">
+          <div class="card-h" style="padding:22px 0 14px;border-bottom:0"><span class="n">2</span><h2>Contact &amp; rig</h2></div>
+          <div class="two">
+            <div class="field"><label for="fName">Name / company</label><input id="fName" placeholder="Driver or fleet" autocomplete="name"></div>
+            <div class="field"><label for="fPhone">Phone</label><input id="fPhone" placeholder="(915) 000-0000" inputmode="tel" autocomplete="tel"></div>
+          </div>
+          <div class="field"><label for="fRig">Rig / tire size <span class="opt">(if known)</span></label><input id="fRig" placeholder="Freightliner · 295/75R22.5 drives"></div>
+          <div class="field"><label for="fNeed">What's the problem?</label><textarea id="fNeed" placeholder="Blew an inside drive · need 1–2 used · truck is loaded"></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- dispatch summary -->
+    <div class="card">
+      <div class="card-h"><span class="n">$</span><h2>Dispatch &amp; deposit</h2></div>
+      <div class="card-b">
+        <div id="main">
+          <div class="dispatch">
+            <div class="drow"><span class="k">Location</span><span class="v" id="dLoc">—</span></div>
+            <div class="drow"><span class="k">Distance</span><span class="v" id="dDist">—</span></div>
+            <div class="drow"><span class="k">In range?</span><span class="v" id="dRange">—</span></div>
+          </div>
+          <div class="deposit">
+            <div class="row"><span class="lbl">Deposit to dispatch</span><span class="amt">$50</span></div>
+            <div class="sub">Flat $50 holds your dispatch. The balance (tires + labor + trip) is charged <b style="color:var(--steel)">at site or at the shop</b> once the work's done.</div>
+          </div>
+          <button class="btn btn-red cta locked" id="cta" onclick="dispatchIt()"><span>Add location first</span></button>
+          <div class="sqr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg> Secure $50 deposit via Square</div>
+          <div class="fine">Demo — no real charge. Live Square checkout wired on build.</div>
+        </div>
+        <div class="success" id="success">
+          <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5 11-11" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Truck dispatched</h3>
+          <p id="sLine">We'll call to confirm and roll out.</p>
+          <div class="ref"><div class="k">Dispatch ref</div><div class="code" id="sRef">MD-0000</div></div>
+          <button class="btn btn-red cta" style="margin-top:0" onclick="location.href='index.html'"><span>Back to site</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="demo">Live demo · 60-mile check &amp; $50 Square deposit are simulated. Real Maps distance + Square checkout wired on build.</div>
+
+<script>
+(function(){
+  var LOCS=[
+    {n:"San Elizario, TX",mi:10},{n:"Clint, TX",mi:12},{n:"Horizon City, TX",mi:14},{n:"Fabens, TX",mi:16},
+    {n:"El Paso, TX",mi:18},{n:"Anthony, TX/NM",mi:25},{n:"Canutillo, TX",mi:28},{n:"Santa Teresa, NM",mi:30},
+    {n:"Chaparral, NM",mi:35},{n:"Las Cruces, NM",mi:55},{n:"Tornillo, TX",mi:22},
+    {n:"Alamogordo, NM",mi:90},{n:"Van Horn, TX",mi:100},{n:"Deming, NM",mi:110}
+  ];
+  var RADIUS=60,inRange=false;
+  var sel=document.getElementById('loc');
+  LOCS.forEach(function(l,i){var o=document.createElement('option');o.value=i;o.textContent=l.n+" — "+l.mi+" mi";sel.appendChild(o);});
+
+  function update(){
+    var box=document.getElementById('range');
+    if(sel.value===""){box.classList.remove('show');document.getElementById('form2').classList.add('dim');lockCta(true,'Add location first');
+      document.getElementById('dLoc').textContent='—';document.getElementById('dDist').textContent='—';document.getElementById('dRange').textContent='—';return;}
+    var l=LOCS[+sel.value];inRange=l.mi<=RADIUS;
+    document.getElementById('dLoc').textContent=l.n;
+    document.getElementById('dDist').textContent=l.mi+" mi";
+    var dr=document.getElementById('dRange');dr.textContent=inRange?'Yes ✓':'No';dr.className='v'+(inRange?' g':'');
+    box.className='rangebox show '+(inRange?'ok':'no');
+    if(inRange){
+      document.getElementById('rangeIc').innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#2fbf6b" stroke-width="1.8"/><path d="M8 12.5l2.5 2.5 5-5" stroke="#2fbf6b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      document.getElementById('rangeT').innerHTML='<b>Within our 60-mile range</b><span>'+l.mi+' miles out — we can roll a truck to you.</span>';
+      document.getElementById('form2').classList.remove('dim');lockCta(false,'Pay $50 &amp; Dispatch →');
+    }else{
+      document.getElementById('rangeIc').innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#ff8a8e" stroke-width="1.8"/><path d="M9 9l6 6M15 9l-6 6" stroke="#ff8a8e" stroke-width="1.8" stroke-linecap="round"/></svg>';
+      document.getElementById('rangeT').innerHTML='<b>Outside our 60-mile range</b><span>'+l.mi+' mi is past our mobile radius — <a href="booking.html">book a bay at the shop</a> instead.</span>';
+      document.getElementById('form2').classList.add('dim');lockCta(true,'Outside 60-mile range');
+    }
+  }
+  function lockCta(lock,txt){var c=document.getElementById('cta');c.classList.toggle('locked',lock);c.querySelector('span').innerHTML=txt;}
+  sel.addEventListener('change',update);
+
+  window.dispatchIt=function(){
+    if(!inRange)return;
+    var nm=document.getElementById('fName').value.trim(),ph=document.getElementById('fPhone').value.trim(),need=document.getElementById('fNeed').value.trim();
+    function flash(id){var e=document.getElementById(id);e.focus();e.style.borderColor='var(--red-hot)';setTimeout(function(){e.style.borderColor='';},1200);}
+    if(!nm){flash('fName');return;}if(!ph){flash('fPhone');return;}if(!need){flash('fNeed');return;}
+    var ref='MD-'+String(Math.floor((+sel.value+1)*137)%9000+1000);
+    document.getElementById('sRef').textContent=ref;
+    document.getElementById('sLine').textContent=LOCS[+sel.value].n+' · $50 deposit held · balance at site or shop';
+    document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
+  };
+})();
+</script>
