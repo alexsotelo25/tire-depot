@@ -179,9 +179,9 @@
   .js .anim{opacity:0;transform:translateY(32px)}
   .js .anim.in{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.16,.8,.3,1),transform .7s cubic-bezier(.16,.8,.3,1)}
   @media (prefers-reduced-motion:reduce){.js .anim{opacity:1;transform:none}}
-  section.blk{padding:clamp(62px,9vw,116px) 0;position:relative;z-index:2}
+  section.blk{padding:clamp(48px,7vw,92px) 0;position:relative;z-index:2}
   .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(16px,3.5vw,40px)}
-  .eb{display:flex;align-items:center;gap:13px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:600}
+  .eb{display:flex;align-items:center;gap:13px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--steel);font-weight:600}
   .eb .n{color:var(--muted-2);font-weight:700}
   .sh{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(30px,4.8vw,58px);line-height:.9;letter-spacing:-.02em;margin:14px 0 0;max-width:20ch}
   .sh .r{color:var(--red)}
@@ -196,7 +196,7 @@
   .why-cell:last-child{border-right:0;border-bottom:0}
   .why-cell::before{content:"";position:absolute;left:0;top:0;width:0;height:3px;background:var(--red);transition:width .6s ease .1s}
   .why-cell.in::before{width:100%}
-  .why-cell .big{font-family:var(--disp);font-weight:900;font-style:italic;font-size:clamp(46px,6vw,74px);color:var(--red);line-height:.85;letter-spacing:-.02em}
+  .why-cell .big{font-family:var(--disp);font-weight:900;font-style:italic;font-size:clamp(46px,6vw,74px);color:var(--white);line-height:.85;letter-spacing:-.02em}
   .why-cell h3{font-family:var(--disp);font-weight:800;font-style:italic;text-transform:uppercase;font-size:20px;margin:14px 0 0}
   .why-cell p{color:var(--muted);font-size:15px;margin:8px 0 0;line-height:1.55}
 
@@ -391,7 +391,7 @@
     <div class="tool" role="region" aria-label="Plan your stop">
       <div class="tool-top">
         <span class="l"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" stroke="#fff" stroke-width="2"/><circle cx="12" cy="10" r="2.4" fill="#fff"/></svg> Plan Your Stop</span>
-        <span class="live"><span class="dot"></span> Live</span>
+        
       </div>
       <div class="tool-body">
         <label class="fld-l" for="origin">Where you rolling in from?</label>
@@ -425,17 +425,6 @@
   <div class="scrolltag"><span class="ln"></span> Scroll · Why Tire Depot</div>
 </header>
 
-<!-- TRUST STRIP -->
-<div class="trust">
-  <div class="trust-in">
-    <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v6c0 4-3 6.5-7 9-4-2.5-7-5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Heavy-duty<br><b>Specialists</b></span></div>
-    <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>In &amp; out<br><b>One hour</b></span></div>
-    <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 7h18v10H3zM3 11h18" stroke="currentColor" stroke-width="1.8"/></svg><span>Cards &amp; Square<br><b>Accepted</b></span></div>
-    <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 17V9l7-4 7 4v8M9 17v-4h6v4" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Fleet accounts<br><b>Welcome</b></span></div>
-    <div class="item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 12h16M12 4l8 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Right off<br><b>I-10</b></span></div>
-  </div>
-</div>
-
 <!-- 01 · WHY US -->
 <section class="why blk" id="why" style="padding-top:0;padding-bottom:0">
   <div class="why-grid">
@@ -457,11 +446,27 @@
   </div>
 </section>
 
+<!-- 03 · HOW IT WORKS -->
+<section class="blk" id="how" style="background:var(--ink-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="anim">
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> How it works</div>
+      <h2 class="sh">Booked before you <span class="r">roll in.</span></h2>
+      <p class="sub">No phone tag, no waiting in line behind three other trucks. Lock your bay from the road.</p>
+    </div>
+    <div class="steps">
+      <div class="step anim"><div class="sn">01</div><h3>Plan your stop</h3><p>Drop where you're rolling in from, see your arrival time, and grab an open bay.</p></div>
+      <div class="step anim"><div class="sn">02</div><h3>Roll in</h3><p>Your bay's ready when you get here. Pull in, we go to work — no sitting around.</p></div>
+      <div class="step anim"><div class="sn">03</div><h3>Back on the road</h3><p>In and out in about an hour, back on I-10 with the load still moving.</p></div>
+    </div>
+  </div>
+</section>
+
 <!-- 02 · SERVICES -->
 <section class="blk" id="services">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="n">02</span> · What we run</div>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> What we run</div>
       <h2 class="sh">Everything your rig needs to <span class="r">roll.</span></h2>
     </div>
     <div class="svc">
@@ -475,29 +480,11 @@
   </div>
 </section>
 
-<!-- INSIDE THE DEPOT -->
-<section class="blk" id="shop" style="background:var(--ink-2);border-top:1px solid var(--line)">
-  <div class="wrap">
-    <div class="anim">
-      <div class="eb"><span class="n">◆</span> Inside the Depot</div>
-      <h2 class="sh">Real bays. Real rigs. <span class="r">Real fast.</span></h2>
-      <p class="sub">Two heavy-duty bays running all day right off I-10. This is the shop that gets you rolling.</p>
-    </div>
-    <div class="bento">
-      <div class="duo big anim"><img src="assets/stock/_yard.jpg" alt="Trucks at the depot" loading="lazy"><span class="cap"><b>The yard</b><span>Room for rigs · off I-10</span></span></div>
-      <div class="duo anim"><img src="assets/stock/_service.jpg" alt="Tire service" loading="lazy"><span class="cap"><b>Fast service</b><span>In &amp; out in an hour</span></span></div>
-      <div class="duo anim"><img src="assets/stock/_rig.jpg" alt="Heavy-duty rig" loading="lazy"><span class="cap"><b>Big rigs welcome</b><span>Semi · trailer · heavy-duty</span></span></div>
-      <div class="duo wide anim"><img src="assets/stock/_heavy.jpg" alt="Heavy-duty tires" loading="lazy"><span class="cap"><b>New &amp; used · repair · balancing</b><span>Everything the rig needs to roll</span></span></div>
-    </div>
-    <div class="shootnote"><span class="speed"><i></i><i></i><i></i></span> <span><b>Placeholder shots</b> — swap for real photos/video of your shop &amp; crew (Film It shoot).</span></div>
-  </div>
-</section>
-
 <!-- SIZE CHECKER -->
 <section class="blk" id="size">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="n">◆</span> Got a size?</div>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Got a size?</div>
       <h2 class="sh">Check your <span class="r">tire size.</span></h2>
       <p class="sub">Drop your size — we'll tell you if we've likely got it in used stock, or new to order. Then lock a bay.</p>
     </div>
@@ -511,18 +498,19 @@
   </div>
 </section>
 
-<!-- 03 · HOW IT WORKS -->
-<section class="blk" id="how" style="background:var(--ink-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+<!-- INSIDE THE DEPOT -->
+<section class="blk" id="shop" style="background:var(--ink-2);border-top:1px solid var(--line)">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="n">03</span> · How it works</div>
-      <h2 class="sh">Booked before you <span class="r">roll in.</span></h2>
-      <p class="sub">No phone tag, no waiting in line behind three other trucks. Lock your bay from the road.</p>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Inside the Depot</div>
+      <h2 class="sh">Real bays. Real rigs. <span class="r">Real fast.</span></h2>
+      <p class="sub">Two heavy-duty bays running all day right off I-10. This is the shop that gets you rolling.</p>
     </div>
-    <div class="steps">
-      <div class="step anim"><div class="sn">01</div><h3>Plan your stop</h3><p>Drop where you're rolling in from, see your arrival time, and grab an open bay.</p></div>
-      <div class="step anim"><div class="sn">02</div><h3>Roll in</h3><p>Your bay's ready when you get here. Pull in, we go to work — no sitting around.</p></div>
-      <div class="step anim"><div class="sn">03</div><h3>Back on the road</h3><p>In and out in about an hour, back on I-10 with the load still moving.</p></div>
+    <div class="bento">
+      <div class="duo big anim"><img src="assets/stock/_yard.jpg" alt="Trucks at the depot" loading="lazy"><span class="cap"><b>The yard</b><span>Room for rigs · off I-10</span></span></div>
+      <div class="duo anim"><img src="assets/stock/_service.jpg" alt="Tire service" loading="lazy"><span class="cap"><b>Fast service</b><span>In &amp; out in an hour</span></span></div>
+      <div class="duo anim"><img src="assets/stock/_rig.jpg" alt="Heavy-duty rig" loading="lazy"><span class="cap"><b>Big rigs welcome</b><span>Semi · trailer · heavy-duty</span></span></div>
+      <div class="duo wide anim"><img src="assets/stock/_heavy.jpg" alt="Heavy-duty tires" loading="lazy"><span class="cap"><b>New &amp; used · repair · balancing</b><span>Everything the rig needs to roll</span></span></div>
     </div>
   </div>
 </section>
@@ -531,7 +519,7 @@
 <section class="blk" id="visit">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="n">04</span> · Coming from out of town</div>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Coming from out of town</div>
       <h2 class="sh">Right off I-10 — <span class="r">easy in, easy out.</span></h2>
     </div>
     <div class="ot">
@@ -562,7 +550,7 @@
   <div class="wrap">
     <div class="mob anim">
       <div>
-        <div class="eb"><span class="n">05</span> · Can't stop?</div>
+        <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Can't stop?</div>
         <h2 class="sh" style="margin-top:12px">We'll come <span class="r">to you.</span></h2>
         <p class="sub">Broke down on the shoulder or sitting at the yard? Tell us where the rig is and what it needs — we roll a truck out, lock your window with a quick deposit, and get you moving.</p>
       </div>
@@ -578,7 +566,7 @@
 <section class="blk" id="proof" style="background:var(--ink-2);border-top:1px solid var(--line)">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="n">06</span> · Don't just take our word</div>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Don't just take our word</div>
       <h2 class="sh">Truckers trust the <span class="r">Depot.</span></h2>
     </div>
     <div class="rev">
@@ -594,7 +582,7 @@
 <section class="blk" id="faq">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="n">◆</span> Good to know</div>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Good to know</div>
       <h2 class="sh">Straight <span class="r">answers.</span></h2>
     </div>
     <div class="faq anim">
