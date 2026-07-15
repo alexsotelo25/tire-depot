@@ -1,0 +1,197 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Tire Depot — Owner Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,600;0,800;0,900;1,800;1,900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --ink:#09090a;--ink-2:#101012;--panel:#151517;--panel-2:#1c1c1f;
+    --line:#2a2a2f;--line-2:#3a3a41;--white:#f6f5f2;--steel:#c9ccd2;--muted:#8d8d95;--muted-2:#5c5c64;
+    --red:#e8121b;--red-hot:#ff3a34;--green:#2fbf6b;--amber:#ffb020;
+    --disp:"Kanit",-apple-system,sans-serif;--mono:"Roboto Mono",ui-monospace,Menlo,monospace;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color-scheme:dark;
+  }
+  *{box-sizing:border-box}html,body{margin:0;padding:0}
+  body{background:radial-gradient(60% 55% at 82% 0%,rgba(232,18,27,.14),transparent 60%),var(--ink);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
+  a{color:inherit;text-decoration:none}.mono{font-family:var(--mono)}
+  nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:14px clamp(16px,3.5vw,40px);background:rgba(9,9,10,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .navlogo{height:28px;width:auto;display:block}
+  .nav-r{display:flex;align-items:center;gap:18px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .nav-r a,.nav-r button{color:var(--muted);cursor:pointer;background:none;border:0;font-family:var(--mono);font-size:12px}
+  .nav-r a:hover,.nav-r button:hover{color:var(--white)}
+  .btn{cursor:pointer;border:0;font-family:var(--disp);font-weight:800;font-style:italic;letter-spacing:.02em;text-transform:uppercase;font-size:14px;padding:12px 20px;border-radius:5px;transition:transform .14s,background .18s;background:var(--red);color:#fff;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{background:var(--red-hot);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;border:1.5px solid var(--line-2);color:var(--white)}
+  .btn.ghost:hover{border-color:var(--red);color:var(--red);background:transparent}
+  .btn.sm{font-size:11px;padding:7px 12px;border-radius:4px}
+  .wrap{max-width:1000px;margin:0 auto;padding:clamp(26px,4vw,44px) clamp(16px,3.5vw,40px) 70px}
+  .eb{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--red);font-weight:600}
+  h1{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(30px,4.6vw,48px);line-height:.92;margin:10px 0 0}
+  .sub{color:var(--muted);margin:8px 0 0;font-size:15px}
+  .card{background:linear-gradient(180deg,var(--panel-2),var(--ink-2));border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:22px}
+  .card-h{padding:15px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .card-h h2{font-family:var(--disp);font-style:italic;font-weight:800;text-transform:uppercase;font-size:16px;margin:0}
+  .card-b{padding:18px 20px}
+  label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+  input,select{width:100%;background:var(--ink);border:1.5px solid var(--line-2);color:var(--white);border-radius:9px;padding:12px 13px;font-size:15px;font-family:var(--sans)}
+  input:focus,select:focus{outline:none;border-color:var(--red)}
+  .row{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:12px;align-items:end}
+  @media(max-width:640px){.row{grid-template-columns:1fr 1fr}}
+  .msg{font-family:var(--mono);font-size:12.5px;margin-top:12px;min-height:16px}
+  .msg.bad{color:var(--red-hot)}.msg.good{color:var(--green)}
+
+  /* login */
+  #login{max-width:400px;margin:8vh auto 0}
+  #login .card-b>*{margin-bottom:12px}
+
+  /* bookings list */
+  .daygroup{border-bottom:1px solid var(--line)}
+  .daygroup:last-child{border-bottom:0}
+  .dayhdr{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);padding:14px 20px 8px;background:var(--ink-2)}
+  .bk{display:grid;grid-template-columns:96px 62px 1fr auto;gap:14px;align-items:center;padding:13px 20px;border-top:1px solid var(--line)}
+  @media(max-width:640px){.bk{grid-template-columns:80px 1fr;row-gap:4px}.bk .who{grid-column:1/3}.bk .act{grid-column:1/3;justify-self:start}}
+  .bk .t{font-family:var(--mono);font-weight:700;font-size:15px}
+  .bk .bay{font-family:var(--mono);font-size:12px;color:var(--steel);border:1px solid var(--line-2);border-radius:100px;padding:3px 9px;text-align:center}
+  .bk.block .bay{color:var(--amber);border-color:rgba(255,176,32,.4)}
+  .bk .who b{font-weight:600}
+  .bk .who .meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
+  .bk.block .who b{color:var(--amber)}
+  .empty{padding:34px 20px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:13px}
+  .stat{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px}
+  .stat .s{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .stat .s b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:22px;color:var(--white);display:block}
+</style>
+
+<nav>
+  <a href="index.html" aria-label="Tire Depot"><img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot"></a>
+  <div class="nav-r">
+    <a href="index.html">← Site</a>
+    <button id="logout" style="display:none" onclick="doLogout()">Log out</button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div id="login" class="wrap" style="display:none">
+  <div class="eb" style="text-align:center">Owner access</div>
+  <h1 style="text-align:center">Dashboard login</h1>
+  <div class="card" style="margin-top:20px"><div class="card-b">
+    <div><label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="you@shop.com"></div>
+    <div><label for="pass">Password</label><input id="pass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
+    <button class="btn" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()"><span>Sign in</span></button>
+    <div class="msg bad" id="loginMsg"></div>
+  </div></div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash" class="wrap" style="display:none">
+  <div class="eb">The Depot</div>
+  <h1>Bay bookings</h1>
+  <p class="sub">Everything on the books, newest day first. Block a bay when a walk-in takes it so the site stays accurate.</p>
+  <div class="stat">
+    <div class="s"><b id="stToday">0</b> today</div>
+    <div class="s"><b id="stWeek">0</b> next 7 days</div>
+    <div class="s"><b id="stTotal">0</b> upcoming</div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>Block a bay (walk-in)</h2></div>
+    <div class="card-b">
+      <div class="row">
+        <div><label for="bDate">Date</label><input id="bDate" type="date"></div>
+        <div><label for="bHour">Time</label><select id="bHour"></select></div>
+        <div><label for="bBay">Bay</label><select id="bBay"><option value="1">Bay 1</option><option value="2">Bay 2</option></select></div>
+        <button class="btn" onclick="doBlock()"><span>Block</span></button>
+      </div>
+      <div class="msg" id="blockMsg"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>Upcoming</h2><button class="btn ghost sm" onclick="loadBookings()"><span>Refresh</span></button></div>
+    <div id="list"><div class="empty">Loading…</div></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var SB_URL="https://kzoaguotyxdcutpegrkg.supabase.co";
+  var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6b2FndW90eXhkY3V0cGVncmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNTMxMzYsImV4cCI6MjA5OTcyOTEzNn0.Wd9xKy1Z7o7sBZUUK6R3bpI4lz2neRdFV523sygguO0";
+  var db=window.supabase.createClient(SB_URL,SB_KEY);
+  var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function iso(d){var m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(day<10?"0":"")+day;}
+  function fmtHour(h){var n=(h%12)||12,ap=h>=12?'PM':'AM';return n+":00 "+ap;}
+  function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  // hour options 8..17
+  var hs=document.getElementById('bHour');for(var h=8;h<18;h++){var o=document.createElement('option');o.value=h;o.textContent=fmtHour(h);hs.appendChild(o);}
+  document.getElementById('bDate').value=iso(new Date());
+  document.getElementById('bDate').min=iso(new Date());
+
+  function show(view){document.getElementById('login').style.display=view==='login'?'':'none';
+    document.getElementById('dash').style.display=view==='dash'?'':'none';
+    document.getElementById('logout').style.display=view==='dash'?'':'none';}
+
+  window.doLogin=function(){
+    var email=document.getElementById('email').value.trim(),pass=document.getElementById('pass').value,m=document.getElementById('loginMsg');
+    m.textContent='Signing in…';m.className='msg';
+    db.auth.signInWithPassword({email:email,password:pass}).then(function(r){
+      if(r.error){m.textContent=r.error.message||'Sign in failed';m.className='msg bad';return;}
+      m.textContent='';show('dash');loadBookings();
+    });
+  };
+  window.doLogout=function(){db.auth.signOut().then(function(){show('login');});};
+
+  window.doBlock=function(){
+    var d=document.getElementById('bDate').value,h=+document.getElementById('bHour').value,bay=+document.getElementById('bBay').value,m=document.getElementById('blockMsg');
+    if(!d){m.textContent='Pick a date';m.className='msg bad';return;}
+    m.textContent='Blocking…';m.className='msg';
+    db.from('bookings').insert({bay:bay,slot_date:d,slot_hour:h,kind:'block',status:'booked',ref:'BLOCK'}).then(function(r){
+      if(r.error){m.textContent=(r.error.code==='23505'?'That bay/time is already taken':r.error.message);m.className='msg bad';return;}
+      m.textContent='Bay '+bay+' blocked '+fmtHour(h);m.className='msg good';loadBookings();
+    });
+  };
+  window.cancelBk=function(id,label){
+    if(!confirm('Cancel this? '+label))return;
+    db.from('bookings').update({status:'cancelled'}).eq('id',id).then(function(r){
+      if(r.error){alert('Could not cancel: '+r.error.message);return;}loadBookings();
+    });
+  };
+
+  window.loadBookings=function(){
+    var today=iso(new Date());
+    db.from('bookings').select('*').eq('status','booked').gte('slot_date',today).order('slot_date').order('slot_hour').order('bay')
+    .then(function(r){
+      var list=document.getElementById('list');
+      if(r.error){list.innerHTML='<div class="empty">Error loading: '+esc(r.error.message)+'</div>';return;}
+      var rows=r.data||[];
+      // stats
+      var wk=iso(new Date(Date.now()+7*86400000));
+      document.getElementById('stToday').textContent=rows.filter(function(x){return x.slot_date===today;}).length;
+      document.getElementById('stWeek').textContent=rows.filter(function(x){return x.slot_date<=wk;}).length;
+      document.getElementById('stTotal').textContent=rows.length;
+      if(!rows.length){list.innerHTML='<div class="empty">No upcoming bookings yet.</div>';return;}
+      var html='',curDate=null;
+      rows.forEach(function(x){
+        if(x.slot_date!==curDate){if(curDate!==null)html+='</div>';curDate=x.slot_date;
+          var dp=x.slot_date.split('-'),dd=new Date(+dp[0],+dp[1]-1,+dp[2]);
+          html+='<div class="daygroup"><div class="dayhdr">'+DOW[dd.getDay()]+' · '+MON[dd.getMonth()]+' '+dd.getDate()+'</div>';
+        }
+        var isB=x.kind==='block';
+        var who=isB?'<b>Blocked — walk-in</b>':'<b>'+esc(x.name)+'</b><div class="meta">'+esc(x.phone)+(x.rig?' · '+esc(x.rig):'')+(x.note?' · '+esc(x.note):'')+(x.ref?' · '+esc(x.ref):'')+'</div>';
+        var label=(isB?'Block':esc(x.name))+' '+fmtHour(x.slot_hour)+' Bay '+x.bay;
+        html+='<div class="bk'+(isB?' block':'')+'"><span class="t">'+fmtHour(x.slot_hour)+'</span><span class="bay">Bay '+x.bay+'</span><div class="who">'+who+'</div><div class="act"><button class="btn ghost sm" onclick="cancelBk(\''+x.id+'\',\''+label.replace(/'/g,'')+'\')"><span>'+(isB?'Unblock':'Cancel')+'</span></button></div></div>';
+      });
+      html+='</div>';
+      list.innerHTML=html;
+    });
+  };
+
+  // session check
+  db.auth.getSession().then(function(r){
+    if(r.data&&r.data.session){show('dash');loadBookings();}else{show('login');}
+  });
+})();
+</script>
