@@ -27,6 +27,7 @@
     padding:15px clamp(16px,3.5vw,40px);background:rgba(9,9,10,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
   .wordmark{font-family:var(--disp);font-weight:900;font-style:italic;font-size:24px;letter-spacing:-.01em;line-height:.9;text-transform:uppercase;display:inline-flex;align-items:center;transform:skewX(-2deg)}
   .wordmark .d{color:#fff;background:var(--red);padding:2px 8px 2px 7px;margin-left:6px;clip-path:polygon(8% 0,100% 0,92% 100%,0 100%)}
+  .navlogo{height:30px;width:auto;display:block}
   .back{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.05em;display:flex;align-items:center;gap:8px}
   .back:hover{color:var(--white)}
 
@@ -116,7 +117,7 @@
 <div class="bg"><div class="asphalt"></div></div>
 
 <nav>
-  <a href="index.html" class="wordmark"><span>Tire</span><span class="d">Depot</span></a>
+  <a href="index.html" aria-label="Tire Depot"><img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot"></a>
   <a href="index.html" class="back">← Back to site</a>
 </nav>
 

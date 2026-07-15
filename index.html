@@ -267,11 +267,46 @@
   .foot-hours{display:flex;justify-content:space-between;font-family:var(--mono);font-size:14px;max-width:220px;padding:3px 0}
   .foot-hours .c{color:var(--muted)}
   .copy{color:var(--muted-2);font-size:12.5px;margin-top:36px;border-top:1px solid var(--line);padding-top:20px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  /* real logo */
+  .navlogo{height:32px;width:auto;display:block}
+  .footlogo{height:46px;width:auto;display:block;margin-bottom:14px}
+  @media(max-width:520px){.navlogo{height:27px}}
+
+  /* intro bumper */
+  #intro{position:fixed;inset:0;z-index:300;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  #intro.gone{animation:introOut .7s cubic-bezier(.7,0,.3,1) forwards}
+  @keyframes introOut{to{opacity:0;visibility:hidden;transform:translateY(-4%)}}
+  #intro .logo{width:min(66vw,540px);opacity:0;transform:scale(.8) rotate(-9deg);animation:introIn 1.05s cubic-bezier(.18,.85,.25,1) forwards;filter:drop-shadow(0 30px 60px rgba(232,18,27,.25))}
+  @keyframes introIn{0%{opacity:0;transform:scale(.8) rotate(-9deg)}62%{opacity:1;transform:scale(1.03) rotate(1.5deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+  #intro .ln{position:absolute;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#fff,transparent);opacity:0;animation:introStreak .8s ease forwards}
+  #intro .lr{background:linear-gradient(90deg,transparent,var(--red-hot),transparent)}
+  @keyframes introStreak{0%{transform:translateX(-60vw);opacity:0}30%{opacity:.9}70%{opacity:.9}100%{transform:translateX(60vw);opacity:0}}
+  #intro .flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(232,18,27,.4),transparent 55%);opacity:0;animation:introFlash 1.05s ease forwards}
+  @keyframes introFlash{0%,50%{opacity:0}66%{opacity:.7}100%{opacity:0}}
 </style>
 
+<div id="intro" aria-hidden="true">
+  <div class="flash"></div>
+  <div class="ln lr" style="top:34%;width:300px;animation-delay:.15s"></div>
+  <div class="ln" style="top:62%;width:220px;animation-delay:.35s"></div>
+  <img class="logo" src="assets/logo-full.png" alt="Tire Depot">
+</div>
+<script>
+  (function(){
+    var i=document.getElementById('intro');
+    var seen=false; try{seen=sessionStorage.getItem('td_intro');}catch(e){}
+    var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+    if(seen||reduce){ i.parentNode.removeChild(i); }
+    else{ try{sessionStorage.setItem('td_intro','1');}catch(e){}
+      setTimeout(function(){ i.classList.add('gone'); setTimeout(function(){ if(i.parentNode)i.parentNode.removeChild(i); },800); },1650);
+    }
+  })();
+</script>
+
 <nav>
-  <a href="#" class="brand" aria-label="Tire Depot home">
-    <span class="wordmark"><span class="t">Tire</span><span class="d">Depot</span></span>
+  <a href="index.html" class="brand" aria-label="Tire Depot home">
+    <img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot">
   </a>
   <div class="navlinks">
     <a href="booking.html">Book a Bay</a>
@@ -480,7 +515,7 @@
 <footer>
   <div class="wrap foot">
     <div>
-      <span class="wordmark" style="font-size:24px"><span class="t">Tire</span><span class="d">Depot</span></span>
+      <img class="footlogo" src="assets/logo-banner.png" alt="Tire Depot">
       <p style="color:var(--muted);max-width:34ch;margin-top:14px">Heavy-duty tire &amp; service for the trucks and trailers moving through the El Paso / Socorro corridor.</p>
     </div>
     <div>
