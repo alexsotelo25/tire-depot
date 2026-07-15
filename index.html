@@ -116,6 +116,12 @@
     font-size:clamp(46px,7.4vw,104px);margin:22px 0 0}
   h1.hh .r{color:var(--red);display:block}
   h1.hh .stroke{-webkit-text-stroke:2px var(--white);color:transparent}
+  h1.hh.promise{font-size:clamp(56px,9vw,128px);margin-top:0;line-height:.83}
+  .promise-kick{font-family:var(--disp);font-weight:800;font-style:italic;text-transform:uppercase;font-size:clamp(19px,2.4vw,31px);color:var(--steel);letter-spacing:-.01em;line-height:1;margin:20px 0 8px}
+  .stamp{display:inline-flex;align-items:center;margin-top:24px;transform:skewX(-7deg);background:var(--red);border-radius:5px;padding:11px 18px;
+    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35), 0 12px 30px -14px rgba(232,18,27,.8)}
+  .stamp>*{transform:skewX(7deg)}
+  .stamp .v{color:#fff;font-family:var(--disp);font-style:italic;font-weight:900;text-transform:uppercase;font-size:clamp(15px,1.7vw,20px);letter-spacing:.03em;display:flex;align-items:center;gap:10px}
   .kicker{color:var(--muted);font-size:clamp(15px,1.5vw,18.5px);max-width:46ch;margin:22px 0 0;line-height:1.6}
   .kicker b{color:var(--white);font-weight:600}
   .hero-cta{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap;align-items:center}
@@ -292,16 +298,16 @@
     <!-- LEFT: message -->
     <div>
       <div class="eyebrow rv d1"><span class="speed red"><i></i><i></i><i></i></span> Socorro · El Paso · I-10 Corridor</div>
-      <h1 class="hh">
-        <span class="slam" style="display:block">Semi &amp; trailer</span>
-        <span class="slam s2 stroke" style="display:block">tires.</span>
-        <span class="r slam s2" style="animation-delay:.22s">In, out, one hour.</span>
+      <div class="promise-kick slam">Semi &amp; trailer tires —</div>
+      <h1 class="hh promise">
+        <span class="slam" style="display:block">In, out,</span>
+        <span class="r slam s2" style="display:block;animation-delay:.16s">one hour.</span>
       </h1>
-      <p class="kicker rv d3">The wrong shop turns a blowout into a lost day. We handle the <b>big rigs</b> — new or used <b>from $100</b> — and get you back on I-10 fast. <b>Two bays, one-hour turns.</b></p>
-      <div class="hero-cta rv d4">
+      <p class="kicker rv d3">The wrong shop turns a blowout into a lost day. We handle the <b>big rigs</b> — new or used <b>from $100</b> — and roll you back onto I-10 in <b>about an hour, not a whole day.</b></p>
+      <div class="stamp rv d4"><span class="v"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8.2" stroke="#fff" stroke-width="2"/><path d="M12 9.2V13l2.6 1.6M9 2.6h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg> In &amp; Out in One Hour</span></div>
+      <div class="hero-cta rv d5">
         <a href="#book" class="btn btn-red"><span>Book a Bay →</span></a>
         <a href="#mobile" class="btn btn-ghost"><span>Mobile Service</span></a>
-        <span class="cta-note"><span class="speed"><i></i><i></i><i></i></span> Mon–Sat · 8–6</span>
       </div>
     </div>
 
@@ -461,8 +467,8 @@
 <section class="blk final" id="book">
   <div class="wrap">
     <div class="anim">
-      <div class="eb" style="justify-content:center"><span class="speed red"><i></i><i></i><i></i></span> Lock it in</div>
-      <h2 class="sh">Grab your bay before you <span class="r">roll in.</span></h2>
+      <div class="eb" style="justify-content:center"><span class="speed red"><i></i><i></i><i></i></span> The one-hour promise</div>
+      <h2 class="sh">In, out, <span class="r">one hour.</span> Grab your bay.</h2>
       <div class="hero-cta">
         <a href="#" class="btn btn-red"><span>Book a Bay →</span></a>
         <a href="tel:+1" class="btn btn-ghost"><span>Call (915) 000-0000</span></a>
