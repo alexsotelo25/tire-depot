@@ -273,17 +273,23 @@
   .footlogo{height:46px;width:auto;display:block;margin-bottom:14px}
   @media(max-width:520px){.navlogo{height:27px}}
 
-  /* intro bumper */
-  #intro{position:fixed;inset:0;z-index:300;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
-  #intro.gone{animation:introOut .7s cubic-bezier(.7,0,.3,1) forwards}
+  /* intro — logo breaks in from strips on a branded backdrop (no black box) */
+  #intro{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;overflow:hidden;
+    background:radial-gradient(60% 55% at 50% 42%, rgba(232,18,27,.18), transparent 60%), #0a0a0c}
+  #intro::before{content:"";position:absolute;inset:0;opacity:.5;mix-blend-mode:overlay;pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E")}
+  #intro.gone{animation:introOut .6s cubic-bezier(.7,0,.3,1) forwards}
   @keyframes introOut{to{opacity:0;visibility:hidden;transform:translateY(-4%)}}
-  #intro .logo{width:min(66vw,540px);opacity:0;transform:scale(.8) rotate(-9deg);animation:introIn 1.05s cubic-bezier(.18,.85,.25,1) forwards;filter:drop-shadow(0 30px 60px rgba(232,18,27,.25))}
-  @keyframes introIn{0%{opacity:0;transform:scale(.8) rotate(-9deg)}62%{opacity:1;transform:scale(1.03) rotate(1.5deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-  #intro .ln{position:absolute;height:3px;border-radius:3px;background:linear-gradient(90deg,transparent,#fff,transparent);opacity:0;animation:introStreak .8s ease forwards}
-  #intro .lr{background:linear-gradient(90deg,transparent,var(--red-hot),transparent)}
-  @keyframes introStreak{0%{transform:translateX(-60vw);opacity:0}30%{opacity:.9}70%{opacity:.9}100%{transform:translateX(60vw);opacity:0}}
-  #intro .flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(232,18,27,.4),transparent 55%);opacity:0;animation:introFlash 1.05s ease forwards}
-  @keyframes introFlash{0%,50%{opacity:0}66%{opacity:.7}100%{opacity:0}}
+  #intro .asm{display:flex;height:min(30vw,220px);filter:drop-shadow(0 30px 60px rgba(0,0,0,.6));transform:scale(.98);animation:asmScale 1.5s ease forwards}
+  @keyframes asmScale{0%{transform:scale(.98)}60%{transform:scale(1.02)}100%{transform:scale(1)}}
+  #intro .asm img{height:100%;width:auto;display:block;opacity:0;transform:translateY(64px) rotate(5deg) scale(.9);
+    animation:asm .72s cubic-bezier(.2,.9,.3,1.25) forwards;animation-delay:calc(var(--i)*.085s)}
+  @keyframes asm{to{opacity:1;transform:none}}
+  #intro .flash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 48%,rgba(232,18,27,.5),transparent 52%);opacity:0;animation:introFlash 1.5s ease forwards}
+  @keyframes introFlash{0%,42%{opacity:0}56%{opacity:.8}100%{opacity:0}}
+  #intro .ln{position:absolute;height:3px;border-radius:3px;opacity:0;background:linear-gradient(90deg,transparent,var(--red-hot),transparent);animation:introStreak .7s ease forwards}
+  #intro .ln.w{background:linear-gradient(90deg,transparent,#fff,transparent)}
+  @keyframes introStreak{0%{transform:translateX(-55vw);opacity:0}35%{opacity:.9}70%{opacity:.9}100%{transform:translateX(55vw);opacity:0}}
 
   /* ===== ENHANCEMENTS ===== */
   .status{display:inline-flex;align-items:center;gap:10px;background:rgba(47,191,107,.1);border:1px solid rgba(47,191,107,.3);border-radius:100px;padding:8px 15px;font-family:var(--mono);font-size:12.5px;font-weight:600;color:#7ee2a6}
@@ -339,10 +345,17 @@
 </style>
 
 <div id="intro" aria-hidden="true">
+  <div class="ln lr" style="top:33%;width:320px;animation-delay:.45s"></div>
+  <div class="ln w" style="top:64%;width:230px;animation-delay:.6s"></div>
   <div class="flash"></div>
-  <div class="ln lr" style="top:34%;width:300px;animation-delay:.15s"></div>
-  <div class="ln" style="top:62%;width:220px;animation-delay:.35s"></div>
-  <img class="logo" src="assets/logo-full.png" alt="Tire Depot">
+  <div class="asm">
+    <img src="assets/logo-s0.png" alt="Tire Depot" style="--i:0">
+    <img src="assets/logo-s1.png" alt="" style="--i:1">
+    <img src="assets/logo-s2.png" alt="" style="--i:2">
+    <img src="assets/logo-s3.png" alt="" style="--i:3">
+    <img src="assets/logo-s4.png" alt="" style="--i:4">
+    <img src="assets/logo-s5.png" alt="" style="--i:5">
+  </div>
 </div>
 <script>
   (function(){
