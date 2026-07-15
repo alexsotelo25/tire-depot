@@ -344,31 +344,6 @@
   .faq p{color:var(--muted);font-size:15px;margin:0 0 18px;line-height:1.6}
 </style>
 
-<div id="intro" aria-hidden="true">
-  <div class="ln lr" style="top:33%;width:320px;animation-delay:.45s"></div>
-  <div class="ln w" style="top:64%;width:230px;animation-delay:.6s"></div>
-  <div class="flash"></div>
-  <div class="asm">
-    <img src="assets/logo-s0.png" alt="Tire Depot" style="--i:0">
-    <img src="assets/logo-s1.png" alt="" style="--i:1">
-    <img src="assets/logo-s2.png" alt="" style="--i:2">
-    <img src="assets/logo-s3.png" alt="" style="--i:3">
-    <img src="assets/logo-s4.png" alt="" style="--i:4">
-    <img src="assets/logo-s5.png" alt="" style="--i:5">
-  </div>
-</div>
-<script>
-  (function(){
-    var i=document.getElementById('intro');
-    var seen=false; try{seen=sessionStorage.getItem('td_intro');}catch(e){}
-    var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-    if(seen||reduce){ i.parentNode.removeChild(i); }
-    else{ try{sessionStorage.setItem('td_intro','1');}catch(e){}
-      setTimeout(function(){ i.classList.add('gone'); setTimeout(function(){ if(i.parentNode)i.parentNode.removeChild(i); },800); },1650);
-    }
-  })();
-</script>
-
 <nav>
   <a href="index.html" class="brand" aria-label="Tire Depot home">
     <img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot">
