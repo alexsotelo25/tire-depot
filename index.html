@@ -383,6 +383,17 @@
   .mbar.show{transform:none}
   .mbar .btn{flex:1;justify-content:center;padding:14px}
   .mbar .btn.call{flex:0 0 auto;padding:14px 18px}
+
+  /* --- polish pass --- */
+  html{scroll-behavior:smooth}
+  :focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:3px}
+  .svc-card{box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
+  .svc-card:hover{box-shadow:0 26px 54px -28px rgba(0,0,0,.85), 0 0 0 1px rgba(232,18,27,.16)}
+  .step{transition:border-color .2s, transform .2s, box-shadow .2s}
+  .step:hover{border-color:var(--line-2);transform:translateY(-2px);box-shadow:0 22px 44px -26px rgba(0,0,0,.8)}
+  .rev-card{transition:border-color .2s, transform .2s}
+  .rev-card:hover{border-color:var(--line-2);transform:translateY(-2px)}
+  .tool{box-shadow:0 54px 110px -46px #000, 0 0 0 1px rgba(232,18,27,.07), 0 1px 0 rgba(255,255,255,.03) inset}
   @media(max-width:760px){.mbar{display:flex}}
 </style><nav>
   <a href="index.html" class="brand" aria-label="Tire Depot home">
@@ -419,7 +430,7 @@
         <span class="slam" style="display:block">In, out,</span>
         <span class="r slam s2" style="display:block;animation-delay:.16s">one hour.</span>
       </h1>
-      <p class="kicker rv d3">The wrong shop turns a blowout into a lost day. We handle the <b>big rigs</b> — new or used <b>from $100</b> — and roll you back onto I-10 <b>fast, not a whole day later.</b></p>
+      <p class="kicker rv d3">The wrong shop turns a blowout into a lost day. We handle the <b>big rigs</b> — new or used <b>from $100</b> — and roll you back onto I-10 <b>the same hour.</b></p>
       <div class="hero-cta rv d4">
         <a href="booking.html" class="btn btn-red"><span>Book a Bay →</span></a>
         <a href="mobile.html" class="btn btn-ghost"><span>Mobile Service</span></a>
@@ -636,5 +647,18 @@
       ? '<span style="color:#7ee2a6;font-size:18px">✓</span> <span><b>'+v+'</b> — a common heavy-duty size we usually keep in <b>used stock</b>. Book a bay and we\'ll have options ready.</span>'
       : '<span style="color:#f4dcae;font-size:16px">☏</span> <span>We may not have <b>'+v+'</b> used on hand — call or book and we\'ll source new or check the racks for you.</span>';
   };
+})();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  if(!window.gsap||!window.ScrollTrigger||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  gsap.registerPlugin(ScrollTrigger);
+  var st={trigger:'.hero',start:'top top',end:'bottom top',scrub:true};
+  if(document.querySelector('.hero .glow'))  gsap.to('.hero .glow', {yPercent:36, ease:'none', scrollTrigger:st});
+  if(document.querySelector('.hero .glow2')) gsap.to('.hero .glow2',{yPercent:-26,ease:'none', scrollTrigger:st});
+  if(document.querySelector('.hero-in'))     gsap.to('.hero-in',    {yPercent:-7, ease:'none', scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:0.6}});
 })();
 </script>
