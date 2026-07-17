@@ -281,6 +281,14 @@
 
   /* PROOF */
   .rev{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:44px}
+  /* auto-scrolling testimonial marquee */
+  .revmarquee{position:relative;margin-top:44px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+  .revtrack{display:flex;width:max-content;animation:revscroll 52s linear infinite;will-change:transform}
+  .revmarquee:hover .revtrack{animation-play-state:paused}
+  @keyframes revscroll{to{transform:translateX(-50%)}}
+  .revtrack .rev-card{flex:0 0 336px;margin-right:14px;white-space:normal}
+  @media(max-width:520px){.revtrack .rev-card{flex:0 0 82vw}}
+  @media (prefers-reduced-motion:reduce){.revtrack{animation:none;flex-wrap:wrap;justify-content:center;width:auto}}
   @media(max-width:860px){.rev{grid-template-columns:1fr}}
   .rev-card{background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:24px}
   .rev-card .stars{color:var(--red);letter-spacing:3px;font-size:14px}
@@ -534,10 +542,21 @@
       <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Don't just take our word</div>
       <h2 class="sh">Truckers trust the <span class="r">Depot.</span></h2>
     </div>
-    <div class="rev">
-      <div class="rev-card anim"><div class="stars">★★★★★</div><p>"Blew a trailer tire coming through on I-10. Called ahead, bay was ready, back on the road in under an hour. These guys move."</p><div class="who">Owner-operator · Odessa run</div></div>
-      <div class="rev-card anim"><div class="stars">★★★★★</div><p>"Only shop around that'll actually handle my rig without a three-day wait. Fair price on used drives too."</p><div class="who">Fleet driver · El Paso</div></div>
-      <div class="rev-card anim"><div class="stars">★★★★★</div><p>"Booked the night before from Midland, rolled in right on time and they had me set. No hassle."</p><div class="who">Long-haul · Permian Basin</div></div>
+    <div class="revmarquee anim">
+      <div class="revtrack">
+        <div class="rev-card"><div class="stars">★★★★★</div><p>"Blew a trailer tire coming through on I-10. Called ahead, bay was ready, back on the road in under an hour. These guys move."</p><div class="who">Owner-operator · Odessa run</div></div>
+        <div class="rev-card"><div class="stars">★★★★★</div><p>"Only shop around that'll actually handle my rig without a three-day wait. Fair price on used drives too."</p><div class="who">Fleet driver · El Paso</div></div>
+        <div class="rev-card"><div class="stars">★★★★★</div><p>"Booked the night before from Midland, rolled in right on time and they had me set. No hassle."</p><div class="who">Long-haul · Permian Basin</div></div>
+        <div class="rev-card"><div class="stars">★★★★★</div><p>"Mobile guy came out to the yard, had two used drives on in 45 minutes. Saved my whole schedule."</p><div class="who">Owner-operator · Socorro</div></div>
+        <div class="rev-card"><div class="stars">★★★★★</div><p>"Straight shooters — told me what I needed, didn't upsell, got me rolling."</p><div class="who">Company driver · Las Cruces</div></div>
+        <div class="rev-card"><div class="stars">★★★★★</div><p>"In and out just like they said. This is my stop now every time I'm through El Paso."</p><div class="who">Long-haul · I-10</div></div>
+        <div class="rev-card" aria-hidden="true"><div class="stars">★★★★★</div><p>"Blew a trailer tire coming through on I-10. Called ahead, bay was ready, back on the road in under an hour. These guys move."</p><div class="who">Owner-operator · Odessa run</div></div>
+        <div class="rev-card" aria-hidden="true"><div class="stars">★★★★★</div><p>"Only shop around that'll actually handle my rig without a three-day wait. Fair price on used drives too."</p><div class="who">Fleet driver · El Paso</div></div>
+        <div class="rev-card" aria-hidden="true"><div class="stars">★★★★★</div><p>"Booked the night before from Midland, rolled in right on time and they had me set. No hassle."</p><div class="who">Long-haul · Permian Basin</div></div>
+        <div class="rev-card" aria-hidden="true"><div class="stars">★★★★★</div><p>"Mobile guy came out to the yard, had two used drives on in 45 minutes. Saved my whole schedule."</p><div class="who">Owner-operator · Socorro</div></div>
+        <div class="rev-card" aria-hidden="true"><div class="stars">★★★★★</div><p>"Straight shooters — told me what I needed, didn't upsell, got me rolling."</p><div class="who">Company driver · Las Cruces</div></div>
+        <div class="rev-card" aria-hidden="true"><div class="stars">★★★★★</div><p>"In and out just like they said. This is my stop now every time I'm through El Paso."</p><div class="who">Long-haul · I-10</div></div>
+      </div>
     </div>
     <div class="rev-note">Example reviews — we'll load Tire Depot's real Google reviews here at launch.</div>
   </div>
