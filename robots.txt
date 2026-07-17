@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /proposal.html
+Sitemap: https://alexsotelo25.github.io/tire-depot/sitemap.xml

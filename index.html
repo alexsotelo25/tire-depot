@@ -1,6 +1,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tire Depot — In, Out, One Hour</title>
+<title>Tire Depot | Semi &amp; Trailer Tires — Socorro / El Paso, TX</title>
+<meta name="description" content="Heavy-duty semi &amp; trailer tires in Socorro / El Paso, right off I-10. New &amp; used from $100, repair, balancing, and 60-mile mobile service. Book a bay online — in, out, one hour.">
+<link rel="canonical" href="https://alexsotelo25.github.io/tire-depot/">
+<meta name="theme-color" content="#0a0a0c">
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tire Depot">
+<meta property="og:title" content="Tire Depot — Semi &amp; Trailer Tires, In &amp; Out in One Hour">
+<meta property="og:description" content="Heavy-duty semi &amp; trailer tires off I-10 in Socorro / El Paso. New &amp; used, repair, balancing, mobile service. Book a bay online.">
+<meta property="og:url" content="https://alexsotelo25.github.io/tire-depot/">
+<meta property="og:image" content="https://alexsotelo25.github.io/tire-depot/assets/logo-full.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tire Depot — Semi &amp; Trailer Tires, In &amp; Out in One Hour">
+<meta name="twitter:description" content="Heavy-duty truck tires off I-10 in Socorro / El Paso. Book a bay online.">
+<meta name="twitter:image" content="https://alexsotelo25.github.io/tire-depot/assets/logo-full.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoRepair",
+  "name": "Tire Depot",
+  "image": "https://alexsotelo25.github.io/tire-depot/assets/logo-full.png",
+  "@id": "https://alexsotelo25.github.io/tire-depot/",
+  "url": "https://alexsotelo25.github.io/tire-depot/",
+  "telephone": "+1-915-000-0000",
+  "priceRange": "$$",
+  "description": "Heavy-duty semi, trailer and truck tire sales and service off I-10 in Socorro / El Paso. New and used tires, repair, balancing, light diesel, and 60-mile mobile service.",
+  "address": { "@type": "PostalAddress", "streetAddress": "1240 Jaime Rd", "addressLocality": "Socorro", "addressRegion": "TX", "postalCode": "79927", "addressCountry": "US" },
+  "geo": { "@type": "GeoCoordinates", "latitude": 31.6548, "longitude": -106.2836 },
+  "openingHoursSpecification": [{ "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "18:00" }],
+  "areaServed": ["Socorro TX","El Paso TX","Las Cruces NM","Van Horn TX","Pecos TX","Odessa TX","Midland TX","I-10 Corridor"],
+  "makesOffer": [
+    {"@type":"Offer","itemOffered":{"@type":"Service","name":"New & used semi/trailer tires"}},
+    {"@type":"Offer","itemOffered":{"@type":"Service","name":"Tire repair & balancing"}},
+    {"@type":"Offer","itemOffered":{"@type":"Service","name":"Mobile roadside tire service (60-mile radius)"}}
+  ]
+}
+</script>
 <style>
 @font-face {
   font-family: 'Kanit';
@@ -342,6 +378,12 @@
   .faq summary::after{content:"+";color:var(--red);font-size:24px;font-family:var(--sans);font-style:normal;flex:none}
   .faq details[open] summary::after{content:"\2013"}
   .faq p{color:var(--muted);font-size:15px;margin:0 0 18px;line-height:1.6}
+  /* sticky mobile book bar (CRO) */
+  .mbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(9,9,10,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line-2);transform:translateY(120%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+  .mbar.show{transform:none}
+  .mbar .btn{flex:1;justify-content:center;padding:14px}
+  .mbar .btn.call{flex:0 0 auto;padding:14px 18px}
+  @media(max-width:760px){.mbar{display:flex}}
 </style><nav>
   <a href="index.html" class="brand" aria-label="Tire Depot home">
     <img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot">
@@ -529,6 +571,11 @@
   </div>
 </footer>
 
+<div class="mbar" id="mbar">
+  <a href="booking.html" class="btn btn-red"><span>Book a Bay →</span></a>
+  <a href="tel:+19150000000" class="btn btn-ghost call" aria-label="Call Tire Depot"><span>Call</span></a>
+</div>
+
 <script>
 (function(){
   var CITIES=[
@@ -563,6 +610,10 @@
     document.querySelectorAll('.anim').forEach(function(el){io.observe(el);});
   }
   var yr=document.getElementById('yr'); if(yr) yr.textContent=new Date().getFullYear();
+
+  // sticky mobile book bar — show after the hero scrolls away
+  var mbar=document.getElementById('mbar');
+  if(mbar){addEventListener('scroll',function(){mbar.classList.toggle('show',(window.scrollY||0)>560);},{passive:true});}
 
   // live shop status
   var st=document.getElementById('shopStatus'), tx=document.getElementById('statusTxt');
