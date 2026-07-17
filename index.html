@@ -131,6 +131,10 @@
   /* HERO */
   .hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding:96px 0 40px}
   .bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+  .bg .photo{position:absolute;inset:0;background:url("assets/stock/hero.jpg") center right/cover no-repeat;opacity:.6;transform:scale(1.02);animation:heroken 30s ease-in-out infinite alternate}
+  @keyframes heroken{to{transform:scale(1.12)}}
+  @media(prefers-reduced-motion:reduce){.bg .photo{animation:none}}
+  .bg .scrim{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,10,.97) 0%,rgba(9,9,10,.86) 30%,rgba(9,9,10,.5) 62%,rgba(9,9,10,.68) 100%),linear-gradient(0deg,rgba(9,9,10,.92),transparent 42%)}
   .bg .glow{position:absolute;width:900px;height:900px;right:-8%;top:44%;transform:translateY(-50%);
     background:radial-gradient(circle,rgba(232,18,27,.34),rgba(232,18,27,.06) 42%,transparent 65%);filter:blur(6px)}
   .bg .glow2{position:absolute;width:620px;height:620px;left:-14%;bottom:-24%;
@@ -309,6 +313,17 @@
   .btn-gold{background:#ffc20e;color:#241c00;box-shadow:0 8px 24px -10px rgba(255,194,14,.7)}
   .btn-gold:hover{background:#ffce3a;transform:skewX(-6deg) translateY(-2px)}
 
+  /* OUT-OF-TOWN CINEMATIC BAND */
+  .roadband{position:relative;padding:clamp(78px,15vh,158px) 0;background:#000;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .roadband::before{content:"";position:absolute;inset:0;background:url("assets/stock/road.jpg") center/cover no-repeat;transform:scale(1.04);animation:heroken 34s ease-in-out infinite alternate}
+  .roadband::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,10,.95),rgba(9,9,10,.55) 52%,rgba(9,9,10,.72)),linear-gradient(0deg,rgba(9,9,10,.92),transparent 58%)}
+  .roadband-in{position:relative;z-index:2}
+  .rb-kick{font-family:var(--mono);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--red);font-weight:600;margin:0}
+  .rb-h{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(38px,6.4vw,86px);line-height:.9;letter-spacing:-.02em;margin:14px 0 0;color:#fff}
+  .rb-sub{max-width:52ch;color:var(--muted);font-size:16px;line-height:1.62;margin:18px 0 0}
+  .roadband .hero-cta{margin-top:28px}
+  @media(prefers-reduced-motion:reduce){.roadband::before{animation:none}}
+
   /* FINAL CTA */
   .final{text-align:center;background:radial-gradient(80% 150% at 50% 0%,rgba(232,18,27,.2),transparent 62%),var(--ink-2);border-top:1px solid var(--line)}
   .final .sh{margin:14px auto 0;max-width:20ch}
@@ -359,8 +374,8 @@
   .bento{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:168px;gap:12px;margin-top:40px}
   @media(max-width:760px){.bento{grid-template-columns:1fr 1fr;grid-auto-rows:140px}}
   .duo{position:relative;overflow:hidden;border-radius:12px;border:1px solid var(--line)}
-  .duo img{width:100%;height:100%;object-fit:cover;filter:grayscale(.4) contrast(1.05) brightness(.92) saturate(1.05);transition:transform .5s,filter .5s}
-  .duo:hover img{transform:scale(1.05);filter:grayscale(.12) contrast(1.06) brightness(1) saturate(1.12)}
+  .duo img{width:100%;height:100%;object-fit:cover;filter:grayscale(.12) contrast(1.05) brightness(.9) saturate(1.02);transition:transform .5s,filter .5s}
+  .duo:hover img{transform:scale(1.05);filter:grayscale(0) contrast(1.07) brightness(1) saturate(1.1)}
   .duo::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(9,9,10,0) 32%,rgba(9,9,10,.5) 72%,rgba(9,9,10,.92) 100%),linear-gradient(140deg,rgba(232,18,27,.18),transparent 48%)}
   .duo .cap{position:absolute;left:0;right:0;bottom:0;padding:15px 17px;z-index:2}
   .duo .cap b{display:block;font-family:var(--disp);font-style:italic;font-weight:800;text-transform:uppercase;font-size:16px}
@@ -436,6 +451,7 @@
 
 <header class="hero">
   <div class="bg">
+    <div class="photo"></div><div class="scrim"></div>
     <div class="glow"></div><div class="glow2"></div><div class="asphalt"></div><div class="hz"></div>
     <div class="streak" style="top:22%;width:280px;animation-delay:.4s"></div>
     <div class="streak w" style="top:38%;width:180px;animation-delay:1.6s"></div>
@@ -546,10 +562,23 @@
       <p class="sub">Two heavy-duty bays running all day right off I-10. This is the shop that gets you rolling.</p>
     </div>
     <div class="bento">
-      <div class="duo big anim"><img src="assets/stock/_yard.jpg" alt="Trucks at the depot" loading="lazy"><span class="cap"><b>The yard</b><span>Room for rigs · off I-10</span></span></div>
-      <div class="duo anim"><img src="assets/stock/_service.jpg" alt="Tire service" loading="lazy"><span class="cap"><b>Fast service</b><span>In &amp; out in an hour</span></span></div>
-      <div class="duo anim"><img src="assets/stock/_rig.jpg" alt="Heavy-duty rig" loading="lazy"><span class="cap"><b>Big rigs welcome</b><span>Semi · trailer · heavy-duty</span></span></div>
-      <div class="duo wide anim"><img src="assets/stock/_heavy.jpg" alt="Heavy-duty tires" loading="lazy"><span class="cap"><b>New &amp; used · repair · balancing</b><span>Everything the rig needs to roll</span></span></div>
+      <div class="duo big anim"><img src="assets/stock/tire.jpg" alt="New and used heavy-duty truck tire" loading="lazy"><span class="cap"><b>New &amp; used</b><span>From $100 · ready to roll</span></span></div>
+      <div class="duo anim"><img src="assets/stock/service.jpg" alt="Impact wrench on a big-rig wheel" loading="lazy"><span class="cap"><b>Fast service</b><span>In &amp; out in an hour</span></span></div>
+      <div class="duo anim"><img src="assets/stock/rig.jpg" alt="Semi truck in the service bay" loading="lazy"><span class="cap"><b>Big rigs welcome</b><span>Semi · trailer · heavy-duty</span></span></div>
+      <div class="duo wide anim"><img src="assets/stock/yard.jpg" alt="Rows of heavy-duty truck tires in stock" loading="lazy"><span class="cap"><b>Always in stock</b><span>Repair · balancing · everything the rig needs</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 05b · OUT-OF-TOWN CINEMATIC BAND -->
+<section class="roadband anim" aria-label="Coming from out of town">
+  <div class="wrap roadband-in">
+    <p class="rb-kick">Rolling in off I-10?</p>
+    <h2 class="rb-h">Book your bay before<br>you hit Socorro.</h2>
+    <p class="rb-sub">Midland, Odessa, Las Cruces — check your arrival time, grab the next open bay, and you're back on the road within the hour of pulling in.</p>
+    <div class="hero-cta">
+      <a href="visit.html" class="btn btn-red"><span>Plan Your Stop →</span></a>
+      <a href="booking.html" class="btn btn-ghost"><span>Book a Bay</span></a>
     </div>
   </div>
 </section>
