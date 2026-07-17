@@ -295,6 +295,17 @@
   .rev-card p{font-size:15px;margin:12px 0 0;color:var(--white);line-height:1.6}
   .rev-card .who{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--muted)}
   .rev-note{text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted-2);margin-top:22px}
+  /* --- award-tier additions --- */
+  .sh .gold{color:#ffc20e}
+  .kband{position:relative;z-index:2;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--ink-2);padding:20px 0}
+  .ktrack{display:flex;align-items:center;width:max-content;white-space:nowrap;will-change:transform}
+  .kitem{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(28px,4.6vw,54px);letter-spacing:-.01em;line-height:1;padding:0 .3em;color:var(--white)}
+  .kitem.stroke{color:transparent;-webkit-text-stroke:1.6px var(--steel)}
+  .kdot{color:var(--red);font-size:clamp(20px,3vw,34px);padding:0 .08em}
+  .review{text-align:center;background:radial-gradient(70% 130% at 50% 0%,rgba(255,194,14,.09),transparent 62%),var(--ink);border-top:1px solid var(--line)}
+  .gstars{margin:20px 0 4px;font-size:clamp(28px,4.4vw,40px);color:#ffc20e;letter-spacing:6px;text-shadow:0 4px 24px rgba(255,194,14,.3)}
+  .btn-gold{background:#ffc20e;color:#241c00;box-shadow:0 8px 24px -10px rgba(255,194,14,.7)}
+  .btn-gold:hover{background:#ffce3a;transform:skewX(-6deg) translateY(-2px)}
 
   /* FINAL CTA */
   .final{text-align:center;background:radial-gradient(80% 150% at 50% 0%,rgba(232,18,27,.2),transparent 62%),var(--ink-2);border-top:1px solid var(--line)}
@@ -481,7 +492,11 @@
   </div>
 
   <div class="scrolltag"><span class="ln"></span> Scroll · Why Tire Depot</div>
-</header><!-- 01 · WHY US -->
+</header>
+
+<div class="kband" aria-hidden="true"><div class="ktrack" id="ktrack"><span class="kitem">In, Out, One Hour</span><span class="kdot">/</span><span class="kitem stroke">Semi</span><span class="kdot">/</span><span class="kitem">Trailer</span><span class="kdot">/</span><span class="kitem stroke">Heavy-Duty</span><span class="kdot">/</span><span class="kitem">New &amp; Used</span><span class="kdot">/</span><span class="kitem stroke">Mobile Service</span><span class="kdot">/</span><span class="kitem">Off I-10</span><span class="kdot">/</span><span class="kitem">In, Out, One Hour</span><span class="kdot">/</span><span class="kitem stroke">Semi</span><span class="kdot">/</span><span class="kitem">Trailer</span><span class="kdot">/</span><span class="kitem stroke">Heavy-Duty</span><span class="kdot">/</span><span class="kitem">New &amp; Used</span><span class="kdot">/</span><span class="kitem stroke">Mobile Service</span><span class="kdot">/</span><span class="kitem">Off I-10</span><span class="kdot">/</span></div></div>
+
+<!-- 01 · WHY US -->
 <section class="why blk" id="why" style="padding-top:0;padding-bottom:0">
   <div class="why-grid">
     <div class="why-cell anim">
@@ -559,6 +574,19 @@
       </div>
     </div>
     <div class="rev-note">Example reviews — we'll load Tire Depot's real Google reviews here at launch.</div>
+  </div>
+</section>
+
+<!-- LEAVE A REVIEW -->
+<section class="blk review" id="review">
+  <div class="wrap anim">
+    <div class="eb" style="justify-content:center">Rolled out happy?</div>
+    <h2 class="sh" style="margin:14px auto 0;max-width:15ch;text-align:center">Drop us a <span class="gold">review.</span></h2>
+    <p class="sub" style="margin:14px auto 0;text-align:center">Ten seconds keeps the next driver rolling. Tell 'em how it went.</p>
+    <div class="gstars" role="img" aria-label="Five stars">★★★★★</div>
+    <div class="hero-cta" style="justify-content:center;margin-top:6px">
+      <a href="https://search.google.com/local/writereview?placeid=YOUR_GOOGLE_PLACE_ID" target="_blank" rel="noopener" class="btn btn-gold"><span>Leave a Google Review →</span></a>
+    </div>
   </div>
 </section>
 
@@ -679,5 +707,22 @@
   if(document.querySelector('.hero .glow'))  gsap.to('.hero .glow', {yPercent:36, ease:'none', scrollTrigger:st});
   if(document.querySelector('.hero .glow2')) gsap.to('.hero .glow2',{yPercent:-26,ease:'none', scrollTrigger:st});
   if(document.querySelector('.hero-in'))     gsap.to('.hero-in',    {yPercent:-7, ease:'none', scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:0.6}});
+  // signature: velocity-reactive kinetic marquee
+  var ktrack=document.getElementById('ktrack');
+  if(ktrack){
+    var roll=gsap.to(ktrack,{xPercent:-50,repeat:-1,ease:'none',duration:26});
+    ScrollTrigger.create({onUpdate:function(self){
+      var v=self.getVelocity();
+      gsap.to(roll,{timeScale:gsap.utils.clamp(-6,6,1+v/300),overwrite:true,duration:.35});
+      gsap.to(ktrack,{skewX:gsap.utils.clamp(-9,9,v/-420),overwrite:true,duration:.35});
+    }});
+  }
+  // micro-interaction: magnetic primary buttons
+  if(matchMedia('(pointer:fine)').matches){
+    document.querySelectorAll('.btn-red, .btn-gold').forEach(function(b){
+      b.addEventListener('mousemove',function(e){var r=b.getBoundingClientRect();var x=(e.clientX-r.left-r.width/2)*.28,y=(e.clientY-r.top-r.height/2)*.34;b.style.transform='skewX(-6deg) translate('+x+'px,'+y+'px)';});
+      b.addEventListener('mouseleave',function(){b.style.transform='';});
+    });
+  }
 })();
 </script>
