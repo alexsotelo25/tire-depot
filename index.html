@@ -445,6 +445,10 @@
   .rev-card{transition:border-color .2s, transform .2s}
   .rev-card:hover{border-color:var(--line-2);transform:translateY(-2px)}
   .tool{box-shadow:0 54px 110px -46px #000, 0 0 0 1px rgba(232,18,27,.07), 0 1px 0 rgba(255,255,255,.03) inset}
+  /* gradient borders — premium card edge */
+  .tool,.step,.rev-card{position:relative}
+  .tool::before,.step::before,.rev-card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(150deg,rgba(255,255,255,.22),rgba(232,18,27,.3) 42%,rgba(255,255,255,.05) 80%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:3}
+  .step:hover::before,.rev-card:hover::before{background:linear-gradient(150deg,rgba(255,255,255,.32),rgba(232,18,27,.5) 42%,rgba(255,255,255,.07) 80%)}
   @media(max-width:760px){.mbar{display:flex}}
 </style>
 <div class="sprog" id="sprog" aria-hidden="true"></div>
