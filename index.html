@@ -125,7 +125,20 @@
   .btn-red:hover{background:var(--red-hot);transform:skewX(-6deg) translateY(-2px)}
   .btn-ghost{background:transparent;color:var(--white);border:1.5px solid var(--line-2)}
   .btn-ghost:hover{border-color:var(--white)}
-  @media(max-width:940px){.navlinks{display:none}.phone{display:none}}
+  .navtoggle{display:none;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:9px;width:44px;height:44px;align-items:center;justify-content:center;cursor:pointer;flex:none}
+  .navmenu,.navbackdrop{display:none}
+  @media(max-width:940px){
+    .navlinks{display:none}.phone{display:none}
+    .navtoggle{display:inline-flex}
+    .navbackdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.62);opacity:0;visibility:hidden;transition:opacity .3s;z-index:55}
+    .navbackdrop.open{opacity:1;visibility:visible}
+    .navmenu{display:block;position:fixed;top:0;right:0;height:100%;width:min(82vw,320px);background:linear-gradient(180deg,var(--ink-2),var(--ink));border-left:1px solid var(--line);transform:translateX(105%);transition:transform .34s cubic-bezier(.4,0,.2,1);z-index:60;padding:84px 24px 26px;box-shadow:-40px 0 80px -40px #000;overflow-y:auto}
+    .navmenu.open{transform:translateX(0)}
+    .navmenu a{display:block;font-family:var(--disp);font-style:italic;font-weight:800;text-transform:uppercase;font-size:23px;color:var(--white);padding:15px 0;border-bottom:1px solid var(--line);letter-spacing:.01em}
+    .navmenu a:last-of-type{border-bottom:0}
+    .navmenu .mclose{position:absolute;top:20px;right:20px;width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;background:none;border:1px solid var(--line);border-radius:9px;cursor:pointer}
+    body.nav-open{overflow:hidden}
+  }
 
   /* HERO */
   .hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding:96px 0 40px}
@@ -463,9 +476,27 @@
     <a href="visit.html">Visit</a>
   </div>
   <div class="nav-r">
+    <button class="navtoggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="#f6f5f2" stroke-width="2" stroke-linecap="round"/></svg></button>
     <a href="booking.html" class="btn btn-red"><span>Book a Bay</span></a>
   </div>
 </nav>
+<div class="navbackdrop" id="navBackdrop"></div>
+<aside class="navmenu" id="navMenu" aria-label="Menu">
+  <button class="mclose" id="navClose" aria-label="Close menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#f6f5f2" stroke-width="2" stroke-linecap="round"/></svg></button>
+  <a href="index.html">Home</a>
+  <a href="booking.html">Book a Bay</a>
+  <a href="services.html">Services</a>
+  <a href="mobile.html">Mobile Service</a>
+  <a href="visit.html">Visit</a>
+</aside>
+<script>
+(function(){var t=document.getElementById('navToggle'),m=document.getElementById('navMenu'),b=document.getElementById('navBackdrop'),c=document.getElementById('navClose');if(!t||!m)return;
+function open(){m.classList.add('open');b.classList.add('open');document.body.classList.add('nav-open');t.setAttribute('aria-expanded','true');}
+function close(){m.classList.remove('open');b.classList.remove('open');document.body.classList.remove('nav-open');t.setAttribute('aria-expanded','false');}
+t.addEventListener('click',open);if(c)c.addEventListener('click',close);b.addEventListener('click',close);
+m.querySelectorAll('a').forEach(function(a){a.addEventListener('click',close);});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});})();
+</script>
 
 <header class="hero">
   <div class="bg">
