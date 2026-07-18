@@ -405,7 +405,7 @@
       </div>
     </div>
     <div class="map-embed anim">
-      <iframe title="Tire Depot — 1240 Jaime Rd, Socorro TX" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=1240%20Jaime%20Rd%20Socorro%20TX%2079927&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
+      <iframe title="Tire Depot — 1240 Jaime Rd, Socorro TX" data-lenis-prevent loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=1240%20Jaime%20Rd%20Socorro%20TX%2079927&t=&z=14&ie=UTF8&iwloc=&output=embed"></iframe>
       <a class="mapbtn" href="https://www.google.com/maps/search/?api=1&query=1240+Jaime+Rd+Socorro+TX+79927" target="_blank" rel="noopener"><span>Open in Maps ↗</span></a>
     </div>
   </div>
@@ -524,4 +524,10 @@
       : '<span style="color:#f4dcae;font-size:16px">☏</span> <span>We may not have <b>'+v+'</b> used on hand — call or book and we\'ll source new or check the racks for you.</span>';
   };
 })();
+</script>
+<!-- Lenis smooth scroll -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<style>html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-stopped{overflow:hidden}.lenis.lenis-smooth iframe{pointer-events:none}</style>
+<script>
+(function(){if(matchMedia('(prefers-reduced-motion:reduce)').matches||!window.Lenis)return;var lenis=new Lenis({lerp:0.09,smoothWheel:true,wheelMultiplier:0.9,anchors:true});requestAnimationFrame(function raf(t){lenis.raf(t);requestAnimationFrame(raf);});})();
 </script>

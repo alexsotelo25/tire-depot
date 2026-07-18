@@ -789,3 +789,20 @@
   }
 })();
 </script>
+<!-- Lenis smooth scroll -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<style>html.lenis,html.lenis body{height:auto}.lenis.lenis-smooth{scroll-behavior:auto!important}.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}.lenis.lenis-stopped{overflow:hidden}.lenis.lenis-smooth iframe{pointer-events:none}</style>
+<script>
+(function(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches||!window.Lenis)return;
+  var lenis=new Lenis({lerp:0.09,smoothWheel:true,wheelMultiplier:0.9,anchors:true});
+  window.__lenis=lenis;
+  if(window.gsap&&window.ScrollTrigger){
+    lenis.on('scroll',ScrollTrigger.update);
+    gsap.ticker.add(function(t){lenis.raf(t*1000);});
+    gsap.ticker.lagSmoothing(0);
+  }else{
+    requestAnimationFrame(function raf(t){lenis.raf(t);requestAnimationFrame(raf);});
+  }
+})();
+</script>
