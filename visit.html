@@ -348,6 +348,16 @@
   .faq summary::after{content:"+";color:var(--red);font-size:24px;font-family:var(--sans);font-style:normal;flex:none}
   .faq details[open] summary::after{content:"\2013"}
   .faq p{color:var(--muted);font-size:15px;margin:0 0 18px;line-height:1.6}
+  /* PAGE HERO BAND */
+  .pghero{position:relative;min-height:50vh;display:flex;align-items:flex-end;overflow:hidden;padding:132px 0 48px;border-bottom:1px solid var(--line);background:#000}
+  .pghero::before{content:"";position:absolute;inset:0;background:var(--pgimg) center/cover no-repeat;transform:scale(1.03);animation:pgken 32s ease-in-out infinite alternate}
+  @keyframes pgken{to{transform:scale(1.12)}}
+  .pghero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,10,.95),rgba(9,9,10,.5) 60%,rgba(9,9,10,.78)),linear-gradient(0deg,rgba(9,9,10,.96),transparent 52%)}
+  .pghero .wrap{position:relative;z-index:2}
+  .pghero h1{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(40px,6.6vw,90px);line-height:.88;letter-spacing:-.02em;margin:14px 0 0;color:#fff}
+  .pghero h1 .r{color:var(--red)}
+  .pghero .sub{max-width:54ch;color:var(--muted);font-size:16px;line-height:1.6;margin:16px 0 0}
+  @media(prefers-reduced-motion:reduce){.pghero::before{animation:none}}
 </style><nav>
   <a href="index.html" class="brand" aria-label="Tire Depot home">
     <img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot">
@@ -359,23 +369,30 @@
     <a href="visit.html">Visit</a>
   </div>
   <div class="nav-r">
-    <a href="tel:+1" class="phone">(915) 000-0000</a>
     <a href="booking.html" class="btn btn-red"><span>Book a Bay</span></a>
   </div>
 </nav>
+
+<header class="pghero" style="--pgimg:url('assets/stock/road.jpg')">
+  <div class="wrap">
+    <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Coming from out of town</div>
+    <h1>Right off <span class="r">I-10.</span></h1>
+    <p class="sub">Easy in, easy out — room for rigs, right behind the Truck Wash in Socorro.</p>
+  </div>
+</header>
 
 <!-- 04 · OUT OF TOWN -->
 <section class="blk" id="visit">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Coming from out of town</div>
-      <h2 class="sh">Right off I-10 — <span class="r">easy in, easy out.</span></h2>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> Find us</div>
+      <h2 class="sh">Where we are &amp; <span class="r">the drive in.</span></h2>
     </div>
     <div class="ot">
       <div class="ot-info anim">
         <div class="row"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.8"/></svg></span><div><div class="k">Where we are</div><div class="v">1240 Jaime Rd, Socorro TX 79927</div><div class="k" style="margin-top:4px;color:var(--muted)">Behind the Truck Wash · room for rigs</div></div></div>
         <div class="row"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><div><div class="k">Hours</div><div class="v">Mon–Sat · 8:00 AM – 6:00 PM</div></div></div>
-        <div class="row"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h4l2 5-2.5 1.5a12 12 0 006 6L15 14l5 2v4a1 1 0 01-1 1A15 15 0 013 6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></span><div><div class="k">Call ahead</div><div class="v">(915) 000-0000</div></div></div>
+        <a class="row" href="booking.html" style="text-decoration:none;color:inherit"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><div><div class="k">Book ahead</div><div class="v">Lock a bay online →</div></div></a>
         <a href="https://www.google.com/maps/search/?api=1&query=1240+Jaime+Rd+Socorro+TX+79927" target="_blank" rel="noopener" class="btn btn-red" style="margin-top:20px"><span>Get Directions →</span></a>
       </div>
       <div class="board anim">
@@ -419,7 +436,7 @@
       <h2 class="sh">In, out, <span class="r">one hour.</span> Grab your bay.</h2>
       <div class="hero-cta">
         <a href="booking.html" class="btn btn-red"><span>Book a Bay →</span></a>
-        <a href="tel:+1" class="btn btn-ghost"><span>Call (915) 000-0000</span></a>
+        <a href="mobile.html" class="btn btn-ghost"><span>Mobile Service</span></a>
       </div>
     </div>
   </div>
@@ -435,7 +452,7 @@
       <h4>Find us</h4>
       <p>1240 Jaime Rd<br>Socorro, TX 79927</p>
       <p style="color:var(--muted);font-size:14px">Behind the Truck Wash</p>
-      <p><a class="ln mono" href="tel:+1">(915) 000-0000</a></p>
+      <p><a class="ln mono" href="booking.html">Book a bay online →</a></p>
     </div>
     <div>
       <h4>Hours</h4>

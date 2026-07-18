@@ -23,7 +23,6 @@
   "image": "https://alexsotelo25.github.io/tire-depot/assets/logo-full.png",
   "@id": "https://alexsotelo25.github.io/tire-depot/",
   "url": "https://alexsotelo25.github.io/tire-depot/",
-  "telephone": "+1-915-000-0000",
   "priceRange": "$$",
   "description": "Heavy-duty semi, trailer and truck tire sales and service off I-10 in Socorro / El Paso. New and used tires, repair, balancing, light diesel, and 60-mile mobile service.",
   "address": { "@type": "PostalAddress", "streetAddress": "1240 Jaime Rd", "addressLocality": "Socorro", "addressRegion": "TX", "postalCode": "79927", "addressCountry": "US" },
@@ -132,8 +131,9 @@
   .hero{position:relative;min-height:100svh;display:flex;align-items:center;overflow:hidden;padding:96px 0 40px}
   .bg{position:absolute;inset:0;z-index:0;overflow:hidden}
   .bg .photo{position:absolute;inset:0;background:url("assets/stock/hero.jpg") center right/cover no-repeat;opacity:.6;transform:scale(1.02);animation:heroken 30s ease-in-out infinite alternate}
+  .bg .herovid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center right;opacity:.62}
   @keyframes heroken{to{transform:scale(1.12)}}
-  @media(prefers-reduced-motion:reduce){.bg .photo{animation:none}}
+  @media(prefers-reduced-motion:reduce){.bg .photo{animation:none} .bg .herovid{display:none}}
   .bg .scrim{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,10,.97) 0%,rgba(9,9,10,.86) 30%,rgba(9,9,10,.5) 62%,rgba(9,9,10,.68) 100%),linear-gradient(0deg,rgba(9,9,10,.92),transparent 42%)}
   .bg .glow{position:absolute;width:900px;height:900px;right:-8%;top:44%;transform:translateY(-50%);
     background:radial-gradient(circle,rgba(232,18,27,.2),rgba(232,18,27,.04) 42%,transparent 65%);filter:blur(6px)}
@@ -196,6 +196,17 @@
   .readout{margin-top:18px;border-top:1px dashed var(--line-2);padding-top:18px;display:none}
   .readout.show{display:block;animation:readoutIn .55s cubic-bezier(.16,.8,.3,1)}
   @keyframes readoutIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .route{margin:16px 0 2px}
+  .rt-ends{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
+  .rt-ends b{color:var(--white)}
+  .rt-line{position:relative;height:3px;border-radius:3px;background:repeating-linear-gradient(90deg,var(--line-2) 0 7px,transparent 7px 15px)}
+  .rt-fill{position:absolute;left:0;top:0;height:100%;width:0;background:var(--red);border-radius:3px;transition:width 1.15s cubic-bezier(.5,0,.2,1)}
+  .rt-truck{position:absolute;top:50%;left:0;transform:translate(-50%,-50%);color:var(--red);line-height:0;transition:left 1.15s cubic-bezier(.5,0,.2,1);filter:drop-shadow(0 2px 7px rgba(232,18,27,.7))}
+  .rt-pin{position:absolute;right:0;top:50%;width:8px;height:8px;border-radius:50%;background:var(--white);transform:translate(50%,-50%);box-shadow:0 0 0 3px rgba(255,255,255,.14)}
+  .tool-trust{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted-2);letter-spacing:.02em}
+  .tool-trust span{display:inline-flex;align-items:center;gap:5px}
+  .tool-trust svg{color:var(--red)}
+  @media(prefers-reduced-motion:reduce){.rt-fill,.rt-truck{transition:none}}
   .dispatch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
   .dcell{background:var(--ink);border:1px solid var(--line);border-radius:8px;padding:11px 13px}
   .dcell .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)}
@@ -444,14 +455,15 @@
     <a href="visit.html">Visit</a>
   </div>
   <div class="nav-r">
-    <a href="tel:+1" class="phone">(915) 000-0000</a>
     <a href="booking.html" class="btn btn-red"><span>Book a Bay</span></a>
   </div>
 </nav>
 
 <header class="hero">
   <div class="bg">
-    <div class="photo"></div><div class="scrim"></div>
+    <div class="photo"></div>
+    <video class="herovid" autoplay muted loop playsinline preload="auto" poster="assets/stock/hero.jpg" aria-hidden="true"><source src="assets/vid/hero.mp4" type="video/mp4"></video>
+    <div class="scrim"></div>
     <div class="glow"></div><div class="glow2"></div><div class="asphalt"></div><div class="hz"></div>
     <div class="streak" style="top:22%;width:280px;animation-delay:.4s"></div>
     <div class="streak w" style="top:38%;width:180px;animation-delay:1.6s"></div>
@@ -500,12 +512,24 @@
             <div class="dcell"><div class="k">Distance</div><div class="v" id="oDist">—</div></div>
             <div class="dcell"><div class="k">Drive time</div><div class="v" id="oDrive">—</div></div>
           </div>
+          <div class="route">
+            <div class="rt-ends"><b id="rtA">Your city</b><span>Tire Depot · Socorro</span></div>
+            <div class="rt-line">
+              <span class="rt-fill" id="rtFill"></span>
+              <span class="rt-truck" id="rtTruck"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M1 6h12v9H1z" fill="currentColor"/><path d="M13 9h4l3 3v3h-7z" fill="currentColor"/><circle cx="6" cy="17" r="2.2" fill="#09090a" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="17" r="2.2" fill="#09090a" stroke="currentColor" stroke-width="1.6"/></svg></span>
+              <span class="rt-pin"></span>
+            </div>
+          </div>
           <div class="eta">
             <div><div class="lbl">You'll roll in around</div><div class="big" id="oEta">—</div></div>
             <div class="bay"><div class="b" id="oBay">—</div><div class="s">next open bay</div></div>
           </div>
           <a href="booking.html" class="btn btn-red book"><span>Book That Bay →</span></a>
-          <div class="tool-foot">Real-time traffic via Google Maps on the live site.</div>
+          <div class="tool-trust">
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> No account needed</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Free to reserve</span>
+            <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg> Bay confirmed instantly</span>
+          </div>
         </div>
       </div>
     </div>
@@ -631,7 +655,7 @@
       <h2 class="sh">In, out, <span class="r">one hour.</span> Grab your bay.</h2>
       <div class="hero-cta">
         <a href="booking.html" class="btn btn-red"><span>Book a Bay →</span></a>
-        <a href="tel:+1" class="btn btn-ghost"><span>Call (915) 000-0000</span></a>
+        <a href="mobile.html" class="btn btn-ghost"><span>Mobile Service</span></a>
       </div>
     </div>
   </div>
@@ -647,7 +671,7 @@
       <h4>Find us</h4>
       <p>1240 Jaime Rd<br>Socorro, TX 79927</p>
       <p style="color:var(--muted);font-size:14px">Behind the Truck Wash</p>
-      <p><a class="ln mono" href="tel:+1">(915) 000-0000</a></p>
+      <p><a class="ln mono" href="booking.html">Book a bay online →</a></p>
     </div>
     <div>
       <h4>Hours</h4>
@@ -664,7 +688,7 @@
 
 <div class="mbar" id="mbar">
   <a href="booking.html" class="btn btn-red"><span>Book a Bay →</span></a>
-  <a href="tel:+19150000000" class="btn btn-ghost call" aria-label="Call Tire Depot"><span>Call</span></a>
+  <a href="mobile.html" class="btn btn-ghost call" aria-label="Mobile service"><span>Mobile</span></a>
 </div>
 
 <script>
@@ -689,6 +713,10 @@
     document.getElementById('oDrive').textContent=dur(c.min);
     document.getElementById('oEta').textContent=clock(arr);
     document.getElementById('oBay').textContent=bayTime(arr);
+    var rtA=document.getElementById('rtA'),rtFill=document.getElementById('rtFill'),rtTruck=document.getElementById('rtTruck');
+    if(rtA){rtA.textContent=c.n;
+      rtFill.style.transition='none';rtTruck.style.transition='none';rtFill.style.width='0';rtTruck.style.left='0';
+      requestAnimationFrame(function(){requestAnimationFrame(function(){rtFill.style.transition='';rtTruck.style.transition='';rtFill.style.width='100%';rtTruck.style.left='100%';});});}
     document.getElementById('ph').style.display='none';
     document.getElementById('ro').classList.add('show');
   });

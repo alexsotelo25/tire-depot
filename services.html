@@ -348,6 +348,16 @@
   .faq summary::after{content:"+";color:var(--red);font-size:24px;font-family:var(--sans);font-style:normal;flex:none}
   .faq details[open] summary::after{content:"\2013"}
   .faq p{color:var(--muted);font-size:15px;margin:0 0 18px;line-height:1.6}
+  /* PAGE HERO BAND */
+  .pghero{position:relative;min-height:50vh;display:flex;align-items:flex-end;overflow:hidden;padding:132px 0 48px;border-bottom:1px solid var(--line);background:#000}
+  .pghero::before{content:"";position:absolute;inset:0;background:var(--pgimg) center/cover no-repeat;transform:scale(1.03);animation:pgken 32s ease-in-out infinite alternate}
+  @keyframes pgken{to{transform:scale(1.12)}}
+  .pghero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,10,.95),rgba(9,9,10,.5) 60%,rgba(9,9,10,.78)),linear-gradient(0deg,rgba(9,9,10,.96),transparent 52%)}
+  .pghero .wrap{position:relative;z-index:2}
+  .pghero h1{font-family:var(--disp);font-weight:900;font-style:italic;text-transform:uppercase;font-size:clamp(40px,6.6vw,90px);line-height:.88;letter-spacing:-.02em;margin:14px 0 0;color:#fff}
+  .pghero h1 .r{color:var(--red)}
+  .pghero .sub{max-width:54ch;color:var(--muted);font-size:16px;line-height:1.6;margin:16px 0 0}
+  @media(prefers-reduced-motion:reduce){.pghero::before{animation:none}}
 </style><nav>
   <a href="index.html" class="brand" aria-label="Tire Depot home">
     <img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot">
@@ -359,24 +369,31 @@
     <a href="visit.html">Visit</a>
   </div>
   <div class="nav-r">
-    <a href="tel:+1" class="phone">(915) 000-0000</a>
     <a href="booking.html" class="btn btn-red"><span>Book a Bay</span></a>
   </div>
 </nav>
+
+<header class="pghero" style="--pgimg:url('assets/stock/service.jpg')">
+  <div class="wrap">
+    <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> What we run</div>
+    <h1>Everything your rig<br>needs to <span class="r">roll.</span></h1>
+    <p class="sub">New, used, repaired, balanced — heavy-duty rubber and service, in and out in an hour.</p>
+  </div>
+</header>
 
 <!-- 02 · SERVICES -->
 <section class="blk" id="services">
   <div class="wrap">
     <div class="anim">
-      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> What we run</div>
-      <h2 class="sh">Everything your rig needs to <span class="r">roll.</span></h2>
+      <div class="eb"><span class="speed red"><i></i><i></i><i></i></span> The full menu</div>
+      <h2 class="sh">Pick your <span class="r">service.</span></h2>
     </div>
     <div class="svc">
       <div class="svc-card anim"><div class="no">01</div><h3>New Tires</h3><p>Fresh heavy-duty rubber for semis, trailers and big rigs — mounted and ready to run.</p><span class="tag">Major brands</span></div>
       <div class="svc-card anim"><div class="no">02</div><h3>Used Tires</h3><p>Inspected, road-ready used tires when you need to stretch the budget without stopping the load.</p><span class="tag">From $100</span></div>
       <div class="svc-card anim"><div class="no">03</div><h3>Repair &amp; Patch</h3><p>Blowouts, flats and section repairs done right so they hold the next thousand miles.</p><span class="tag">Walk-in or book</span></div>
       <div class="svc-card anim"><div class="no">04</div><h3>Balancing</h3><p>Kill the shake, save the tread. Precision balancing for a smoother, longer-lasting run.</p><span class="tag">1-hour service</span></div>
-      <div class="svc-card anim"><div class="no">05</div><h3>Light Diesel</h3><p>Light diesel work to handle the quick stuff and keep small issues from becoming breakdowns.</p><span class="tag">Call to confirm</span></div>
+      <div class="svc-card anim"><div class="no">05</div><h3>Light Diesel</h3><p>Light diesel work to handle the quick stuff and keep small issues from becoming breakdowns.</p><span class="tag">Book to confirm</span></div>
       <div class="svc-card anim feat"><div class="no">06</div><h3>Mobile Service</h3><p>Stuck roadside or at the yard? We roll a truck out to you and get you moving.</p><span class="tag">We come to you →</span></div>
     </div>
   </div>
@@ -425,7 +442,7 @@
       <h2 class="sh">In, out, <span class="r">one hour.</span> Grab your bay.</h2>
       <div class="hero-cta">
         <a href="booking.html" class="btn btn-red"><span>Book a Bay →</span></a>
-        <a href="tel:+1" class="btn btn-ghost"><span>Call (915) 000-0000</span></a>
+        <a href="mobile.html" class="btn btn-ghost"><span>Mobile Service</span></a>
       </div>
     </div>
   </div>
@@ -441,7 +458,7 @@
       <h4>Find us</h4>
       <p>1240 Jaime Rd<br>Socorro, TX 79927</p>
       <p style="color:var(--muted);font-size:14px">Behind the Truck Wash</p>
-      <p><a class="ln mono" href="tel:+1">(915) 000-0000</a></p>
+      <p><a class="ln mono" href="booking.html">Book a bay online →</a></p>
     </div>
     <div>
       <h4>Hours</h4>
