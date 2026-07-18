@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Tire Depot — Owner Dashboard</title>
+<title>Tire Depot — Shop Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,600;0,800;0,900;1,800;1,900&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
   *{box-sizing:border-box}html,body{margin:0;padding:0}
   body{background:radial-gradient(60% 55% at 82% 0%,rgba(232,18,27,.14),transparent 60%),var(--ink);color:var(--white);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh}
   a{color:inherit;text-decoration:none}.mono{font-family:var(--mono)}
+  :focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:3px}
   nav{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:14px clamp(16px,3.5vw,40px);background:rgba(9,9,10,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
   .navlogo{height:28px;width:auto;display:block}
   .nav-r{display:flex;align-items:center;gap:18px;font-family:var(--mono);font-size:12px;color:var(--muted)}
@@ -42,12 +43,8 @@
   @media(max-width:640px){.row{grid-template-columns:1fr 1fr}}
   .msg{font-family:var(--mono);font-size:12.5px;margin-top:12px;min-height:16px}
   .msg.bad{color:var(--red-hot)}.msg.good{color:var(--green)}
-
-  /* login */
   #login{max-width:400px;margin:8vh auto 0}
   #login .card-b>*{margin-bottom:12px}
-
-  /* bookings list */
   .daygroup{border-bottom:1px solid var(--line)}
   .daygroup:last-child{border-bottom:0}
   .dayhdr{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--steel);padding:14px 20px 8px;background:var(--ink-2)}
@@ -69,7 +66,7 @@
   <a href="index.html" aria-label="Tire Depot"><img class="navlogo" src="assets/logo-banner.png" alt="Tire Depot"></a>
   <div class="nav-r">
     <span id="whoami" class="mono" style="display:none"></span>
-    <a href="shop.html" id="shopLink" style="display:none">Shop view</a>
+    <a href="dashboard.html" id="ownerLink" style="display:none">Owner view</a>
     <a href="index.html">← Site</a>
     <button id="logout" style="display:none" onclick="doLogout()">Log out</button>
   </div>
@@ -77,8 +74,8 @@
 
 <!-- LOGIN -->
 <div id="login" class="wrap" style="display:none">
-  <div class="eb" style="text-align:center">Owner access</div>
-  <h1 style="text-align:center">Dashboard login</h1>
+  <div class="eb" style="text-align:center">Shop access</div>
+  <h1 style="text-align:center">Shop login</h1>
   <div class="card" style="margin-top:20px"><div class="card-b">
     <div><label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="you@shop.com"></div>
     <div><label for="pass">Password</label><input id="pass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
@@ -91,19 +88,19 @@
 <div id="noaccess" class="wrap" style="display:none;max-width:440px;margin:12vh auto 0;text-align:center">
   <div class="eb" style="text-align:center">No access</div>
   <h1 style="text-align:center">Not on the team</h1>
-  <p class="sub">This login doesn't have dashboard access yet. The owner adds people in Supabase.</p>
+  <p class="sub">This login doesn't have shop access yet. The owner adds people in Supabase.</p>
   <button class="btn ghost" style="margin-top:18px" onclick="doLogout()"><span>Sign out</span></button>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dash" class="wrap" style="display:none">
-  <div class="eb">The Depot</div>
-  <h1>Bay bookings</h1>
-  <p class="sub">Everything on the books, newest day first. Block a bay when a walk-in takes it so the site stays accurate.</p>
+  <div class="eb">The bays · <span id="todayLabel"></span></div>
+  <h1>Today at the shop</h1>
+  <p class="sub">Who's booked, block a bay when a walk-in takes one, and cancel no-shows so the site stays accurate.</p>
   <div class="stat">
-    <div class="s"><b id="stToday">0</b> today</div>
-    <div class="s"><b id="stWeek">0</b> next 7 days</div>
-    <div class="s"><b id="stTotal">0</b> upcoming</div>
+    <div class="s"><b id="stToday">0</b> booked today</div>
+    <div class="s"><b id="stOpen">—</b> open slots left today</div>
+    <div class="s"><b id="stSoon">0</b> next 7 days</div>
   </div>
 
   <div class="card">
@@ -120,13 +117,13 @@
   </div>
 
   <div class="card">
-    <div class="card-h"><h2>Upcoming</h2><button class="btn ghost sm" onclick="loadBookings()"><span>Refresh</span></button></div>
-    <div id="list"><div class="empty">Loading…</div></div>
+    <div class="card-h"><h2>Today</h2><button class="btn ghost sm" onclick="loadAll()"><span>Refresh</span></button></div>
+    <div id="todayList"><div class="empty">Loading…</div></div>
   </div>
 
   <div class="card">
-    <div class="card-h"><h2>History &amp; cancellations</h2><button class="btn ghost sm" id="histBtn" onclick="toggleHistory()"><span>Show history</span></button></div>
-    <div id="histList" style="display:none"><div class="empty">Loading…</div></div>
+    <div class="card-h"><h2>Coming up</h2></div>
+    <div id="soonList"><div class="empty">Loading…</div></div>
   </div>
 </div>
 
@@ -140,10 +137,10 @@
   function fmtHour(h){var n=(h%12)||12,ap=h>=12?'PM':'AM';return n+":00 "+ap;}
   function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 
-  // hour options 8..17
   var hs=document.getElementById('bHour');for(var h=8;h<18;h++){var o=document.createElement('option');o.value=h;o.textContent=fmtHour(h);hs.appendChild(o);}
   document.getElementById('bDate').value=iso(new Date());
   document.getElementById('bDate').min=iso(new Date());
+  (function(){var d=new Date();document.getElementById('todayLabel').textContent=DOW[d.getDay()]+' '+MON[d.getMonth()]+' '+d.getDate();})();
 
   var role=null;
   function show(view){
@@ -151,23 +148,18 @@
     document.getElementById('logout').style.display=(view==='dash'||view==='noaccess')?'':'none';
     document.getElementById('whoami').style.display=view==='dash'?'':'none';
   }
-
-  // Decide what the signed-in user can see, based on their staff role.
   function gate(){
     db.rpc('my_role').then(function(r){
-      if(r.error){ // roles not set up in Supabase yet -> legacy owner mode
-        role='owner';enterDash();return;
-      }
-      role=r.data; // 'owner' | 'shop' | 'admin' | null
-      if(!role){show('noaccess');return;}      // logged in but not staff
-      if(role==='shop'){window.location.replace('shop.html');return;} // shop belongs on shop.html
-      enterDash();                              // owner / admin
+      if(r.error){role='shop';enterDash();return;}       // roles not set up yet -> legacy shop mode
+      role=r.data;                                        // 'owner' | 'shop' | 'admin' | null
+      if(!role){show('noaccess');return;}                // logged in but not staff
+      enterDash();                                        // shop, owner and admin can all use this board
     });
   }
   function enterDash(){
-    document.getElementById('whoami').textContent=(role==='admin'?'Admin':'Owner');
-    document.getElementById('shopLink').style.display='';
-    show('dash');loadBookings();
+    document.getElementById('whoami').textContent=(role==='admin'?'Admin':(role==='owner'?'Owner':'Shop'));
+    if(role==='owner'||role==='admin')document.getElementById('ownerLink').style.display='';
+    show('dash');loadAll();
   }
 
   window.doLogin=function(){
@@ -186,69 +178,50 @@
     m.textContent='Blocking…';m.className='msg';
     db.from('bookings').insert({bay:bay,slot_date:d,slot_hour:h,kind:'block',status:'booked',ref:'BLOCK'}).then(function(r){
       if(r.error){m.textContent=(r.error.code==='23505'?'That bay/time is already taken':r.error.message);m.className='msg bad';return;}
-      m.textContent='Bay '+bay+' blocked '+fmtHour(h);m.className='msg good';loadBookings();
+      m.textContent='Bay '+bay+' blocked '+fmtHour(h);m.className='msg good';loadAll();
     });
   };
   window.cancelBk=function(id,label){
     if(!confirm('Cancel this? '+label))return;
     db.from('bookings').update({status:'cancelled'}).eq('id',id).then(function(r){
-      if(r.error){alert('Could not cancel: '+r.error.message);return;}loadBookings();
+      if(r.error){alert('Could not cancel: '+r.error.message);return;}loadAll();
     });
   };
 
-  // shared row renderer — showAct adds the Cancel/Unblock button
-  function rowsHtml(rows,showAct){
+  function rowsHtml(rows){
     var html='',curDate=null;
     rows.forEach(function(x){
       if(x.slot_date!==curDate){if(curDate!==null)html+='</div>';curDate=x.slot_date;
         var dp=x.slot_date.split('-'),dd=new Date(+dp[0],+dp[1]-1,+dp[2]);
         html+='<div class="daygroup"><div class="dayhdr">'+DOW[dd.getDay()]+' · '+MON[dd.getMonth()]+' '+dd.getDate()+'</div>';
       }
-      var isB=x.kind==='block',cx=(x.status==='cancelled');
+      var isB=x.kind==='block';
       var who=isB?'<b>Blocked — walk-in</b>':'<b>'+esc(x.name)+'</b><div class="meta">'+esc(x.phone)+(x.rig?' · '+esc(x.rig):'')+(x.note?' · '+esc(x.note):'')+(x.ref?' · '+esc(x.ref):'')+'</div>';
       var label=(isB?'Block':esc(x.name))+' '+fmtHour(x.slot_hour)+' Bay '+x.bay;
-      var act=showAct?'<div class="act"><button class="btn ghost sm" onclick="cancelBk(\''+x.id+'\',\''+label.replace(/'/g,'')+'\')"><span>'+(isB?'Unblock':'Cancel')+'</span></button></div>':'<div class="act"><span class="mono" style="font-size:11px;color:var(--muted-2)">'+(cx?'cancelled':'done')+'</span></div>';
-      html+='<div class="bk'+(isB?' block':'')+'" style="'+(cx?'opacity:.5':'')+'"><span class="t">'+fmtHour(x.slot_hour)+'</span><span class="bay">Bay '+x.bay+'</span><div class="who">'+who+'</div>'+act+'</div>';
+      html+='<div class="bk'+(isB?' block':'')+'"><span class="t">'+fmtHour(x.slot_hour)+'</span><span class="bay">Bay '+x.bay+'</span><div class="who">'+who+'</div><div class="act"><button class="btn ghost sm" onclick="cancelBk(\''+x.id+'\',\''+label.replace(/'/g,'')+'\')"><span>'+(isB?'Unblock':'Cancel')+'</span></button></div></div>';
     });
     if(curDate!==null)html+='</div>';
     return html;
   }
 
-  window.loadBookings=function(){
+  window.loadAll=function(){
     var today=iso(new Date());
     db.from('bookings').select('*').eq('status','booked').gte('slot_date',today).order('slot_date').order('slot_hour').order('bay')
     .then(function(r){
-      var list=document.getElementById('list');
-      if(r.error){list.innerHTML='<div class="empty">Error loading: '+esc(r.error.message)+'</div>';return;}
+      var tl=document.getElementById('todayList'),sl=document.getElementById('soonList');
+      if(r.error){tl.innerHTML=sl.innerHTML='<div class="empty">Error loading: '+esc(r.error.message)+'</div>';return;}
       var rows=r.data||[];
+      var todayRows=rows.filter(function(x){return x.slot_date===today;});
+      var soonRows=rows.filter(function(x){return x.slot_date>today;});
       var wk=iso(new Date(Date.now()+7*86400000));
-      document.getElementById('stToday').textContent=rows.filter(function(x){return x.slot_date===today;}).length;
-      document.getElementById('stWeek').textContent=rows.filter(function(x){return x.slot_date<=wk;}).length;
-      document.getElementById('stTotal').textContent=rows.length;
-      list.innerHTML=rows.length?rowsHtml(rows,true):'<div class="empty">No upcoming bookings yet.</div>';
+      document.getElementById('stToday').textContent=todayRows.length;
+      document.getElementById('stOpen').textContent=Math.max(0,(20 - todayRows.length)); // 2 bays x 10 slots = 20/day
+      document.getElementById('stSoon').textContent=rows.filter(function(x){return x.slot_date<=wk;}).length;
+      tl.innerHTML=todayRows.length?rowsHtml(todayRows):'<div class="empty">Nothing booked today yet.</div>';
+      sl.innerHTML=soonRows.length?rowsHtml(soonRows):'<div class="empty">Nothing coming up yet.</div>';
     });
   };
 
-  var histShown=false;
-  window.toggleHistory=function(){
-    var el=document.getElementById('histList'),btn=document.getElementById('histBtn').querySelector('span');
-    histShown=!histShown;
-    el.style.display=histShown?'':'none';btn.textContent=histShown?'Hide history':'Show history';
-    if(histShown)loadHistory();
-  };
-  function loadHistory(){
-    var today=iso(new Date()),el=document.getElementById('histList');
-    el.innerHTML='<div class="empty">Loading…</div>';
-    // past (already happened) OR cancelled — owner-only view
-    db.from('bookings').select('*').or('slot_date.lt.'+today+',status.eq.cancelled').order('slot_date',{ascending:false}).order('slot_hour').limit(200)
-    .then(function(r){
-      if(r.error){el.innerHTML='<div class="empty">Error: '+esc(r.error.message)+'</div>';return;}
-      var rows=r.data||[];
-      el.innerHTML=rows.length?rowsHtml(rows,false):'<div class="empty">No history yet.</div>';
-    });
-  }
-
-  // session check
   db.auth.getSession().then(function(r){
     if(r.data&&r.data.session){gate();}else{show('login');}
   });
