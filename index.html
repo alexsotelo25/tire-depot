@@ -83,7 +83,7 @@
     --ink:#09090a; --ink-2:#101012; --panel:#151517; --panel-2:#1c1c1f;
     --line:#2a2a2f; --line-2:#3a3a41;
     --red:#e8121b; --red-hot:#ff3a34; --red-deep:#b00d14;
-    --white:#f6f5f2; --steel:#c9ccd2; --muted:#8d8d95; --muted-2:#5c5c64;
+    --white:#f6f5f2; --steel:#c9ccd2; --muted:#8d8d95; --muted-2:#808088;
     --green:#39d353;
     --disp:"Kanit",-apple-system,sans-serif;
     --mono:"Roboto Mono",ui-monospace,Menlo,monospace;
@@ -120,7 +120,7 @@
   .btn{cursor:pointer;border:0;font-family:var(--disp);font-weight:800;font-style:italic;letter-spacing:.02em;text-transform:uppercase;font-size:14px;
     padding:12px 22px;border-radius:3px;transition:transform .14s,background .18s,box-shadow .18s;display:inline-flex;align-items:center;gap:9px;transform:skewX(-6deg)}
   .btn>*{transform:skewX(6deg);display:inline-flex;align-items:center;gap:9px}
-  .btn:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+  .btn:focus-visible{outline:3px solid #fff;outline-offset:2px}
   .btn-red{background:var(--red);color:#fff;box-shadow:0 8px 24px -10px var(--red)}
   .btn-red:hover{background:var(--red-hot);transform:skewX(-6deg) translateY(-2px)}
   .btn-ghost{background:transparent;color:var(--white);border:1.5px solid var(--line-2)}
@@ -134,6 +134,10 @@
   .bg .herovid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center right;opacity:.62}
   @keyframes heroken{to{transform:scale(1.12)}}
   @media(prefers-reduced-motion:reduce){.bg .photo{animation:none} .bg .herovid{display:none}}
+  /* pause offscreen animations (perf/battery) */
+  .revtrack.vis-paused{animation-play-state:paused}
+  .bg.vis-paused .photo{animation-play-state:paused}
+  .roadband.vis-paused::before{animation-play-state:paused}
   .bg .scrim{position:absolute;inset:0;background:linear-gradient(90deg,rgba(9,9,10,.97) 0%,rgba(9,9,10,.86) 30%,rgba(9,9,10,.5) 62%,rgba(9,9,10,.68) 100%),linear-gradient(0deg,rgba(9,9,10,.92),transparent 42%)}
   .bg .glow{position:absolute;width:900px;height:900px;right:-8%;top:44%;transform:translateY(-50%);
     background:radial-gradient(circle,rgba(232,18,27,.2),rgba(232,18,27,.04) 42%,transparent 65%);filter:blur(6px)}
@@ -433,7 +437,7 @@
 
   /* --- polish pass --- */
   html{scroll-behavior:smooth}
-  :focus-visible{outline:2px solid var(--red);outline-offset:3px;border-radius:3px}
+  :focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:3px}
   .svc-card{box-shadow:0 1px 0 rgba(255,255,255,.02) inset}
   .svc-card:hover{box-shadow:0 26px 54px -28px rgba(0,0,0,.85), 0 0 0 1px rgba(232,18,27,.16)}
   .step{transition:border-color .2s, transform .2s, box-shadow .2s}
@@ -787,6 +791,23 @@
       b.addEventListener('mouseleave',function(){b.style.transform='';});
     });
   }
+})();
+</script>
+<!-- pause offscreen animations -->
+<script>
+(function(){
+  if(!('IntersectionObserver' in window))return;
+  var vid=document.querySelector('.herovid');
+  var rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function obs(el,cb){if(!el)return;new IntersectionObserver(function(es){es.forEach(function(e){cb(e.target,!e.isIntersecting);});},{threshold:0}).observe(el);}
+  obs(document.querySelector('.hero'),function(t,off){
+    var bg=t.querySelector('.bg');if(bg)bg.classList.toggle('vis-paused',off);
+    if(vid){if(off){vid.pause();}else if(!rm){var p=vid.play();if(p&&p.catch)p.catch(function(){});}}
+  });
+  obs(document.querySelector('#proof'),function(t,off){var tr=t.querySelector('.revtrack');if(tr)tr.classList.toggle('vis-paused',off);});
+  obs(document.querySelector('.roadband'),function(t,off){t.classList.toggle('vis-paused',off);});
+  var kb=document.querySelector('.kband'),ktrack=document.getElementById('ktrack');
+  if(kb&&ktrack&&window.gsap){obs(kb,function(t,off){gsap.getTweensOf(ktrack).forEach(function(tw){off?tw.pause():tw.resume();});});}
 })();
 </script>
 <!-- Lenis smooth scroll -->
