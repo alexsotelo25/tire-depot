@@ -176,7 +176,7 @@
   </div>
 </div>
 
-<div class="demo">Live bookings · double-book protected · your info stays private. Questions? Call the shop.</div>
+<div class="demo">$50 deposit confirms your bay · double-book protected · your info stays private · <a href="terms.html">Terms</a> · <a href="privacy.html">Privacy</a></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -284,6 +284,6 @@
     if(db){loading=true;renderDays();renderSlots();Promise.all(days.map(fetchDay)).then(function(){loading=false;renderDays();renderSlots();sync();});}else{renderDays();renderSlots();sync();}};
   renderDays();renderSlots();sync();
   if(db){Promise.all(days.map(fetchDay)).then(function(){loading=false;renderDays();renderSlots();sync();});}
-  else{loading=false;renderDays();renderSlots();sync();showMsg('Booking is temporarily unavailable — please call the shop.',true);}
+  else{loading=false;renderDays();renderSlots();sync();showMsg('Booking is temporarily unavailable — please try again shortly.',true);}
 })();
 </script>
