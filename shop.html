@@ -56,6 +56,8 @@
   .bk .who b{font-weight:600}
   .bk .who .meta{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:2px}
   .bk.block .who b{color:var(--amber)}
+  .bk .paid{font-family:var(--mono);font-size:13px;color:var(--green);font-weight:700}
+  .bk .act{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
   .empty{padding:34px 20px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:13px}
   .stat{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px}
   .stat .s{font-family:var(--mono);font-size:12px;color:var(--muted)}
@@ -187,6 +189,23 @@
       if(r.error){alert('Could not cancel: '+r.error.message);return;}loadAll();
     });
   };
+  function money(a){return '$'+(Math.round((+a||0)*100)/100).toFixed(2);}
+  window.markPaid=function(id,label){
+    var a=prompt('Amount collected for '+label+'?  (numbers only, e.g. 250)','');
+    if(a===null)return;
+    a=parseFloat(String(a).replace(/[^0-9.]/g,''));
+    if(!(a>0)){alert('Enter a dollar amount.');return;}
+    db.from('bookings').update({paid:true,amount:a,paid_at:new Date().toISOString()}).eq('id',id).then(function(r){
+      if(r.error){alert(/column|paid|amount/i.test(r.error.message)?'Run db/payments.sql in Supabase first (adds the payment columns).':'Could not save: '+r.error.message);return;}
+      loadAll();
+    });
+  };
+  window.unmarkPaid=function(id){
+    if(!confirm('Mark this as unpaid?'))return;
+    db.from('bookings').update({paid:false,amount:null,paid_at:null}).eq('id',id).then(function(r){
+      if(r.error){alert('Could not update: '+r.error.message);return;}loadAll();
+    });
+  };
 
   function rowsHtml(rows){
     var html='',curDate=null;
@@ -197,8 +216,12 @@
       }
       var isB=x.kind==='block';
       var who=isB?'<b>Blocked — walk-in</b>':'<b>'+esc(x.name)+'</b><div class="meta">'+esc(x.phone)+(x.rig?' · '+esc(x.rig):'')+(x.note?' · '+esc(x.note):'')+(x.ref?' · '+esc(x.ref):'')+'</div>';
-      var label=(isB?'Block':esc(x.name))+' '+fmtHour(x.slot_hour)+' Bay '+x.bay;
-      html+='<div class="bk'+(isB?' block':'')+'"><span class="t">'+fmtHour(x.slot_hour)+'</span><span class="bay">Bay '+x.bay+'</span><div class="who">'+who+'</div><div class="act"><button class="btn ghost sm" onclick="cancelBk(\''+x.id+'\',\''+label.replace(/'/g,'')+'\')"><span>'+(isB?'Unblock':'Cancel')+'</span></button></div></div>';
+      var label=(isB?'Block':esc(x.name))+' '+fmtHour(x.slot_hour)+' Bay '+x.bay,lid=label.replace(/'/g,'');
+      var act='<div class="act">';
+      if(!isB)act+= x.paid ? '<span class="paid">✓ '+money(x.amount)+'</span><button class="btn ghost sm" onclick="unmarkPaid(\''+x.id+'\')"><span>Undo</span></button>'
+                           : '<button class="btn ghost sm" onclick="markPaid(\''+x.id+'\',\''+lid+'\')"><span>Mark paid</span></button>';
+      act+='<button class="btn ghost sm" onclick="cancelBk(\''+x.id+'\',\''+lid+'\')"><span>'+(isB?'Unblock':'Cancel')+'</span></button></div>';
+      html+='<div class="bk'+(isB?' block':'')+'"><span class="t">'+fmtHour(x.slot_hour)+'</span><span class="bay">Bay '+x.bay+'</span><div class="who">'+who+'</div>'+act+'</div>';
     });
     if(curDate!==null)html+='</div>';
     return html;
