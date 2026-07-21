@@ -160,15 +160,17 @@
             <div class="field"><label for="fRig">Rig / tire <span style="color:var(--muted-2);text-transform:none;letter-spacing:0">(optional)</span></label><input id="fRig" placeholder="Freightliner · 53' reefer"></div>
             <div class="field"><label for="fNote">What do you need? <span style="color:var(--muted-2);text-transform:none;letter-spacing:0">(optional)</span></label><input id="fNote" placeholder="2 used drives · patch a flat"></div>
             <button class="btn btn-red cta locked" id="cta" onclick="confirmB()"><span>Select a bay first</span></button>
-            <div class="fine">No payment now — pay at the shop. We'll hold your bay.</div>
+            <div class="fine">A $50 deposit confirms your bay — balance at the shop. Secure checkout on Square.</div>
           </div>
         </div>
         <div class="success" id="success">
           <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5 11-11" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>You're booked</h3>
-          <p id="sLine">Bay held — see you then.</p>
+          <h3>Bay held</h3>
+          <p id="sLine">Pay the $50 deposit to confirm.</p>
           <div class="ref"><div class="k">Confirmation</div><div class="code" id="sRef">TD-0000</div></div>
-          <button class="ghost" onclick="resetB()">Book another bay</button>
+          <a class="btn btn-red cta" id="payBtn" style="margin-top:0" href="#" target="_blank" rel="noopener"><span>Pay $50 deposit →</span></a>
+          <div class="fine" id="payNote" style="margin-top:10px">Secure checkout on Square. Your bay is on the schedule.</div>
+          <button class="ghost" style="margin-top:12px" onclick="resetB()">Book another bay</button>
         </div>
       </div>
     </div>
@@ -183,6 +185,8 @@
   var SB_URL="https://kzoaguotyxdcutpegrkg.supabase.co";
   var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6b2FndW90eXhkY3V0cGVncmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNTMxMzYsImV4cCI6MjA5OTcyOTEzNn0.Wd9xKy1Z7o7sBZUUK6R3bpI4lz2neRdFV523sygguO0";
   var db=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
+  // ↓↓↓ PASTE the Square hosted $50-deposit Payment Link URL here (same link as mobile) ↓↓↓
+  var SQUARE_DEPOSIT_URL="__PASTE_SQUARE_50_DEPOSIT_LINK__";
   var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var OPEN=8,CLOSE=18,sel={di:0,hour:null,bay:null},TAKEN={},loading=true;
   function iso(d){var m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(day<10?"0":"")+day;}
@@ -241,6 +245,9 @@
           (TAKEN[iso(dd)]=TAKEN[iso(dd)]||new Set()).add(sel.hour+"-"+sel.bay);
           document.getElementById('sRef').textContent=res.ref;
           document.getElementById('sLine').textContent=DOW[dd.getDay()]+' '+MON[dd.getMonth()]+' '+dd.getDate()+' · '+fmtHour(sel.hour)+' · Bay '+sel.bay;
+          var pb=document.getElementById('payBtn'),note=document.getElementById('payNote');
+          if(SQUARE_DEPOSIT_URL&&SQUARE_DEPOSIT_URL.indexOf('__')!==0){pb.href=SQUARE_DEPOSIT_URL;}
+          else{pb.removeAttribute('href');pb.classList.add('locked');pb.querySelector('span').textContent='Deposit link coming';note.textContent='Your bay is on the schedule — the shop will confirm.';}
           document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
           sel.hour=null;sel.bay=null;renderDays();renderSlots();
         }else{
