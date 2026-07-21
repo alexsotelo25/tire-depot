@@ -183,11 +183,10 @@
         </div>
         <div class="success" id="success">
           <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5 11-11" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Request logged</h3>
-          <p id="sLine">Pay the $50 deposit and we'll roll a truck to you.</p>
+          <h3>Truck on the way</h3>
+          <p id="sLine">We're rolling to you.</p>
           <div class="ref"><div class="k">Dispatch ref</div><div class="code" id="sRef">MD-0000</div></div>
-          <a class="btn btn-red cta" id="payBtn" style="margin-top:0" href="#" target="_blank" rel="noopener"><span>Pay $50 deposit →</span></a>
-          <div class="fine" id="payNote" style="margin-top:10px">Secure checkout on Square. Your details are already with the shop.</div>
+          <div class="fine" id="payNote" style="margin-top:10px">Deposit received. The shop has your rig's location.</div>
         </div>
       </div>
     </div>
@@ -202,8 +201,9 @@
   var SB_URL="https://kzoaguotyxdcutpegrkg.supabase.co";
   var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6b2FndW90eXhkY3V0cGVncmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNTMxMzYsImV4cCI6MjA5OTcyOTEzNn0.Wd9xKy1Z7o7sBZUUK6R3bpI4lz2neRdFV523sygguO0";
   var db=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
-  // ↓↓↓ PASTE the Square hosted $50-deposit Payment Link URL here (from Square → Payment Links) ↓↓↓
-  var SQUARE_DEPOSIT_URL="__PASTE_SQUARE_50_DEPOSIT_LINK__";
+  // ↓↓↓ PASTE the Square "Mobile Deposit $50" Payment Link here. In Square, set its
+  //     "after payment" redirect to:  https://alexsotelo25.github.io/tire-depot/mobile.html?paid=1
+  var SQUARE_MOBILE_URL="__PASTE_SQUARE_MOBILE_DEPOSIT_LINK__";
   var LOCS=[
     {n:"San Elizario, TX",mi:10},{n:"Clint, TX",mi:12},{n:"Horizon City, TX",mi:14},{n:"Fabens, TX",mi:16},
     {n:"El Paso, TX",mi:18},{n:"Anthony, TX/NM",mi:25},{n:"Canutillo, TX",mi:28},{n:"Santa Teresa, NM",mi:30},
@@ -250,13 +250,22 @@
   function lockCta(lock,txt){var c=document.getElementById('cta');c.classList.toggle('locked',lock);c.querySelector('span').innerHTML=txt;}
   sel.addEventListener('change',update);
 
-  function goSuccess(ref,area){
+  function finishMobile(ref,area,paid){
     document.getElementById('sRef').textContent=ref;
-    document.getElementById('sLine').textContent=area+' · pay the $50 deposit to send the truck';
-    var pb=document.getElementById('payBtn'),note=document.getElementById('payNote');
-    if(SQUARE_DEPOSIT_URL && SQUARE_DEPOSIT_URL.indexOf('__')!==0){pb.href=SQUARE_DEPOSIT_URL;}
-    else{pb.removeAttribute('href');pb.classList.add('locked');pb.querySelector('span').textContent='Deposit link coming';note.textContent='Your details are with the shop — they’ll reach out to take the deposit.';}
+    document.getElementById('sLine').textContent=paid?(area+' · truck is rolling'):(area+' · request received');
+    document.querySelector('#success h3').textContent=paid?'Truck on the way':'Request received';
+    document.getElementById('payNote').textContent=paid?"Deposit received. The shop has your rig's location.":'The shop has your details and will take the deposit.';
     document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
+  }
+  // save the request for real — on return from a completed Square payment (paid=true), or directly in setup mode.
+  function createMobileNow(p,paid){
+    lockCta(true,'Sending…');
+    if(!db){finishMobile('MD-'+(Math.floor(Math.random()*9000)+1000),p.area,paid);return;}
+    db.rpc('create_mobile_request',{p_area:p.area,p_location:p.location,p_name:p.name,p_phone:p.phone,p_rig:p.rig,p_need:p.need,p_lat:p.lat,p_lng:p.lng}).then(function(r){
+      lockCta(false,'Pay $50 &amp; Dispatch →');
+      if(r.error||!(r.data&&r.data.ok)){alert('Could not send request: '+((r.data&&r.data.error)||(r.error&&r.error.message)||'please try again'));return;}
+      finishMobile(r.data.ref,p.area,paid);
+    });
   }
   window.dispatchIt=function(){
     if(!inRange)return;
@@ -265,13 +274,20 @@
     var nm=document.getElementById('fName').value.trim(),ph=document.getElementById('fPhone').value.trim();
     var rig=document.getElementById('fRig').value.trim(),need=document.getElementById('fNeed').value.trim();
     if(!loc){flash('addr');return;}if(!nm){flash('fName');return;}if(!ph){flash('fPhone');return;}if(!need){flash('fNeed');return;}
-    var c=document.getElementById('cta');lockCta(true,'Sending…');
-    if(!db){goSuccess('MD-'+(String(Math.floor((+sel.value+1)*137)%9000+1000)),area);return;}
-    db.rpc('create_mobile_request',{p_area:area,p_location:loc,p_name:nm,p_phone:ph,p_rig:rig,p_need:need,p_lat:GEO.lat,p_lng:GEO.lng}).then(function(r){
-      lockCta(false,'Pay $50 &amp; Dispatch →');
-      if(r.error||!(r.data&&r.data.ok)){alert('Could not send request: '+((r.data&&r.data.error)||(r.error&&r.error.message)||'please try again'));return;}
-      goSuccess(r.data.ref,area);
-    });
+    var p={area:area,location:loc,name:nm,phone:ph,rig:rig,need:need,lat:GEO.lat,lng:GEO.lng};
+    if(SQUARE_MOBILE_URL&&SQUARE_MOBILE_URL.indexOf('__')!==0){
+      try{sessionStorage.setItem('td_pending_mobile',JSON.stringify(p));}catch(e){}
+      lockCta(true,'Going to checkout…');
+      window.location.href=SQUARE_MOBILE_URL;      // pay first — Square returns to mobile.html?paid=1
+    }else{
+      createMobileNow(p,false);                      // setup mode (no link yet)
+    }
   };
+  (function(){var q=new URLSearchParams(location.search);if(q.get('paid')==='1'){
+    var raw=null;try{raw=sessionStorage.getItem('td_pending_mobile');sessionStorage.removeItem('td_pending_mobile');}catch(e){}
+    var p=null;try{p=raw?JSON.parse(raw):null;}catch(e){}
+    if(p)createMobileNow(p,true);
+    if(history.replaceState)history.replaceState({},'',location.pathname);
+  }})();
 })();
 </script>

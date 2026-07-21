@@ -165,11 +165,10 @@
         </div>
         <div class="success" id="success">
           <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5 11-11" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Bay held</h3>
-          <p id="sLine">Pay the $50 deposit to confirm.</p>
+          <h3>Booked &amp; paid</h3>
+          <p id="sLine">See you then.</p>
           <div class="ref"><div class="k">Confirmation</div><div class="code" id="sRef">TD-0000</div></div>
-          <a class="btn btn-red cta" id="payBtn" style="margin-top:0" href="#" target="_blank" rel="noopener"><span>Pay $50 deposit →</span></a>
-          <div class="fine" id="payNote" style="margin-top:10px">Secure checkout on Square. Your bay is on the schedule.</div>
+          <div class="fine" id="payNote" style="margin-top:10px">Deposit received — your bay is confirmed.</div>
           <button class="ghost" style="margin-top:12px" onclick="resetB()">Book another bay</button>
         </div>
       </div>
@@ -185,8 +184,9 @@
   var SB_URL="https://kzoaguotyxdcutpegrkg.supabase.co";
   var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6b2FndW90eXhkY3V0cGVncmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNTMxMzYsImV4cCI6MjA5OTcyOTEzNn0.Wd9xKy1Z7o7sBZUUK6R3bpI4lz2neRdFV523sygguO0";
   var db=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
-  // ↓↓↓ PASTE the Square hosted $50-deposit Payment Link URL here (same link as mobile) ↓↓↓
-  var SQUARE_DEPOSIT_URL="__PASTE_SQUARE_50_DEPOSIT_LINK__";
+  // ↓↓↓ PASTE the Square "Bay Deposit $50" Payment Link here. In Square, set its
+  //     "after payment" redirect to:  https://alexsotelo25.github.io/tire-depot/booking.html?paid=1
+  var SQUARE_BAY_URL="__PASTE_SQUARE_BAY_DEPOSIT_LINK__";
   var DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   var OPEN=8,CLOSE=18,sel={di:0,hour:null,bay:null},TAKEN={},loading=true;
   function iso(d){var m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(day<10?"0":"")+day;}
@@ -226,36 +226,59 @@
     vd.textContent=DOW[dd.getDay()]+', '+MON[dd.getMonth()]+' '+dd.getDate();vd.classList.remove('empty');document.getElementById('sDay').classList.add('done');
     var vt=document.getElementById('vTime'),cta=document.getElementById('cta');
     if(sel.hour!==null){vt.textContent=fmtHour(sel.hour)+' · Bay '+sel.bay;vt.classList.remove('empty');document.getElementById('sTime').classList.add('done');
-      document.getElementById('form').classList.remove('dim');cta.classList.remove('locked');cta.querySelector('span').textContent='Confirm booking →';}
+      document.getElementById('form').classList.remove('dim');cta.classList.remove('locked');cta.querySelector('span').textContent='Book & Pay $50 →';}
     else{vt.textContent='Select a slot';vt.classList.add('empty');document.getElementById('sTime').classList.remove('done');
       document.getElementById('form').classList.add('dim');cta.classList.add('locked');cta.querySelector('span').textContent='Select a bay first';}
   }
   function showMsg(msg,bad){var f=document.querySelector('.fine');if(!f)return;if(f._t)clearTimeout(f._t);if(f._orig==null)f._orig=f.innerHTML;f.style.color=bad?'var(--red-hot)':'var(--green)';f.textContent=msg;f._t=setTimeout(function(){f.style.color='';f.innerHTML=f._orig;},4200);}
+  function bayReset(){var cta=document.getElementById('cta');if(cta){cta.classList.remove('locked');cta.querySelector('span').textContent='Book & Pay $50 →';}}
+  // create the booking for real — called on return from a completed Square payment (paid=true),
+  // or directly in setup mode before the Square link is pasted (paid=false).
+  function createBookingNow(p,paid){
+    var cta=document.getElementById('cta');if(cta){cta.classList.add('locked');cta.querySelector('span').textContent='Booking…';}
+    db.rpc('create_booking',{p_bay:p.bay,p_date:p.date,p_hour:p.hour,p_name:p.name,p_phone:p.phone,p_rig:p.rig,p_note:p.note})
+      .then(function(r){
+        if(r.error){showMsg("Couldn't reach the shop — try again.",true);bayReset();return;}
+        var res=r.data;
+        if(res&&res.ok){
+          (TAKEN[p.date]=TAKEN[p.date]||new Set()).add(p.hour+"-"+p.bay);
+          document.getElementById('sRef').textContent=res.ref;
+          var dp=p.date.split('-'),dd=new Date(+dp[0],+dp[1]-1,+dp[2]);
+          document.getElementById('sLine').textContent=DOW[dd.getDay()]+' '+MON[dd.getMonth()]+' '+dd.getDate()+' · '+fmtHour(p.hour)+' · Bay '+p.bay;
+          document.querySelector('#success h3').textContent=paid?'Booked & paid':'Bay booked';
+          document.getElementById('payNote').textContent=paid?'Deposit received — your bay is confirmed.':'Your bay is on the schedule.';
+          document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
+          sel.hour=null;sel.bay=null;renderDays();renderSlots();
+        }else{
+          bayReset();
+          if(paid)alert('Your payment went through, but that slot was just taken. Please contact the shop to rebook or refund — keep your Square receipt.');
+          showMsg((res&&res.error)||'That slot was just taken.',true);
+          if(db)Promise.all(days.map(fetchDay)).then(function(){renderDays();renderSlots();sync();});
+        }
+      }).catch(function(){showMsg('Network hiccup — try again.',true);bayReset();});
+  }
   window.confirmB=function(){if(sel.hour===null)return;
     var nm=document.getElementById('fName').value.trim(),ph=document.getElementById('fPhone').value.trim();
     function flash(id){var e=document.getElementById(id);e.focus();e.style.borderColor='var(--red-hot)';setTimeout(function(){e.style.borderColor='';},1200);}
     if(!nm){flash('fName');return;}if(!ph){flash('fPhone');return;}
-    if(!db){showMsg('Booking is temporarily unavailable — please call the shop.',true);return;}
-    var dd=days[sel.di],cta=document.getElementById('cta');cta.classList.add('locked');cta.querySelector('span').textContent='Booking…';
-    db.rpc('create_booking',{p_bay:sel.bay,p_date:iso(dd),p_hour:sel.hour,p_name:nm,p_phone:ph,p_rig:document.getElementById('fRig').value.trim(),p_note:document.getElementById('fNote').value.trim()})
-      .then(function(r){
-        if(r.error){showMsg('Couldn\'t reach the shop — try again.',true);cta.classList.remove('locked');cta.querySelector('span').textContent='Confirm booking →';return;}
-        var res=r.data;
-        if(res&&res.ok){
-          (TAKEN[iso(dd)]=TAKEN[iso(dd)]||new Set()).add(sel.hour+"-"+sel.bay);
-          document.getElementById('sRef').textContent=res.ref;
-          document.getElementById('sLine').textContent=DOW[dd.getDay()]+' '+MON[dd.getMonth()]+' '+dd.getDate()+' · '+fmtHour(sel.hour)+' · Bay '+sel.bay;
-          var pb=document.getElementById('payBtn'),note=document.getElementById('payNote');
-          if(SQUARE_DEPOSIT_URL&&SQUARE_DEPOSIT_URL.indexOf('__')!==0){pb.href=SQUARE_DEPOSIT_URL;}
-          else{pb.removeAttribute('href');pb.classList.add('locked');pb.querySelector('span').textContent='Deposit link coming';note.textContent='Your bay is on the schedule — the shop will confirm.';}
-          document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
-          sel.hour=null;sel.bay=null;renderDays();renderSlots();
-        }else{
-          showMsg((res&&res.error)||'That slot was just taken.',true);
-          fetchDay(dd).then(function(){sel.hour=null;sel.bay=null;renderDays();renderSlots();sync();});
-        }
-      }).catch(function(){showMsg('Network hiccup — try again.',true);cta.classList.remove('locked');cta.querySelector('span').textContent='Confirm booking →';});
+    if(!db){showMsg('Booking is temporarily unavailable — please try again.',true);return;}
+    var dd=days[sel.di];
+    var p={bay:sel.bay,date:iso(dd),hour:sel.hour,name:nm,phone:ph,rig:document.getElementById('fRig').value.trim(),note:document.getElementById('fNote').value.trim()};
+    if(SQUARE_BAY_URL&&SQUARE_BAY_URL.indexOf('__')!==0){
+      try{sessionStorage.setItem('td_pending_booking',JSON.stringify(p));}catch(e){}
+      var cta=document.getElementById('cta');cta.classList.add('locked');cta.querySelector('span').textContent='Going to checkout…';
+      window.location.href=SQUARE_BAY_URL;            // pay first — Square returns to booking.html?paid=1
+    }else{
+      createBookingNow(p,false);                       // setup mode (no link yet): book directly
+    }
   };
+  // returned from a completed Square payment? finish the booking now.
+  (function(){var q=new URLSearchParams(location.search);if(q.get('paid')==='1'){
+    var raw=null;try{raw=sessionStorage.getItem('td_pending_booking');sessionStorage.removeItem('td_pending_booking');}catch(e){}
+    var p=null;try{p=raw?JSON.parse(raw):null;}catch(e){}
+    if(p&&db)createBookingNow(p,true);
+    if(history.replaceState)history.replaceState({},'',location.pathname);
+  }})();
   window.resetB=function(){['fName','fPhone','fRig','fNote'].forEach(function(id){document.getElementById(id).value='';});
     sel.hour=null;sel.bay=null;document.getElementById('success').classList.remove('show');document.getElementById('main').style.display='';
     if(db){loading=true;renderDays();renderSlots();Promise.all(days.map(fetchDay)).then(function(){loading=false;renderDays();renderSlots();sync();});}else{renderDays();renderSlots();sync();}};
