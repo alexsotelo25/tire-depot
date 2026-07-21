@@ -63,6 +63,17 @@
   .stat{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px}
   .stat .s{font-family:var(--mono);font-size:12px;color:var(--muted)}
   .stat .s b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:22px;color:var(--white);display:block}
+  /* tabs + payments */
+  .card-h.tabs{gap:10px;flex-wrap:wrap}
+  .tabbar{display:flex;gap:6px;flex-wrap:wrap}
+  .tab{cursor:pointer;background:none;border:1px solid var(--line);color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:7px 13px;border-radius:100px;transition:.15s}
+  .tab:hover{color:var(--white)}
+  .tab.on{background:var(--red);border-color:var(--red);color:#fff}
+  .paidtotals{display:flex;gap:24px;flex-wrap:wrap;padding:15px 20px;border-bottom:1px solid var(--line);background:var(--ink-2)}
+  .paidtotals .pt{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .paidtotals .pt b{font-family:var(--disp);font-style:italic;font-weight:900;font-size:22px;color:var(--green);display:block}
+  .bk .paid{font-family:var(--mono);font-size:13px;color:var(--green);font-weight:700}
+  .bk .act{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 </style>
 
 <nav>
@@ -120,13 +131,16 @@
   </div>
 
   <div class="card">
-    <div class="card-h"><h2>Upcoming</h2><button class="btn ghost sm" onclick="loadBookings()"><span>Refresh</span></button></div>
+    <div class="card-h tabs">
+      <div class="tabbar">
+        <button class="tab on" data-tab="upcoming" onclick="switchTab('upcoming')">Upcoming</button>
+        <button class="tab" data-tab="paid" onclick="switchTab('paid')">Paid</button>
+        <button class="tab" data-tab="history" onclick="switchTab('history')">History</button>
+      </div>
+      <button class="btn ghost sm" onclick="refreshTab()"><span>Refresh</span></button>
+    </div>
+    <div id="paidTotals" class="paidtotals" style="display:none"></div>
     <div id="list"><div class="empty">Loading…</div></div>
-  </div>
-
-  <div class="card">
-    <div class="card-h"><h2>History &amp; cancellations</h2><button class="btn ghost sm" id="histBtn" onclick="toggleHistory()"><span>Show history</span></button></div>
-    <div id="histList" style="display:none"><div class="empty">Loading…</div></div>
   </div>
 </div>
 
@@ -186,18 +200,35 @@
     m.textContent='Blocking…';m.className='msg';
     db.from('bookings').insert({bay:bay,slot_date:d,slot_hour:h,kind:'block',status:'booked',ref:'BLOCK'}).then(function(r){
       if(r.error){m.textContent=(r.error.code==='23505'?'That bay/time is already taken':r.error.message);m.className='msg bad';return;}
-      m.textContent='Bay '+bay+' blocked '+fmtHour(h);m.className='msg good';loadBookings();
+      m.textContent='Bay '+bay+' blocked '+fmtHour(h);m.className='msg good';switchTab('upcoming');
     });
   };
   window.cancelBk=function(id,label){
     if(!confirm('Cancel this? '+label))return;
     db.from('bookings').update({status:'cancelled'}).eq('id',id).then(function(r){
-      if(r.error){alert('Could not cancel: '+r.error.message);return;}loadBookings();
+      if(r.error){alert('Could not cancel: '+r.error.message);return;}refreshTab();
+    });
+  };
+  function money(a){return '$'+(Math.round((+a||0)*100)/100).toFixed(2);}
+  window.markPaid=function(id,label){
+    var a=prompt('Amount collected for '+label+'?  (numbers only, e.g. 250)','');
+    if(a===null)return;
+    a=parseFloat(String(a).replace(/[^0-9.]/g,''));
+    if(!(a>0)){alert('Enter a dollar amount.');return;}
+    db.from('bookings').update({paid:true,amount:a,paid_at:new Date().toISOString()}).eq('id',id).then(function(r){
+      if(r.error){alert(/column|paid|amount/i.test(r.error.message)?'Run db/payments.sql in Supabase first (adds the payment columns).':'Could not save: '+r.error.message);return;}
+      refreshTab();
+    });
+  };
+  window.unmarkPaid=function(id){
+    if(!confirm('Mark this as unpaid?'))return;
+    db.from('bookings').update({paid:false,amount:null,paid_at:null}).eq('id',id).then(function(r){
+      if(r.error){alert('Could not update: '+r.error.message);return;}refreshTab();
     });
   };
 
-  // shared row renderer — showAct adds the Cancel/Unblock button
-  function rowsHtml(rows,showAct){
+  // shared row renderer — mode: 'upcoming' | 'paid' | 'history'
+  function rowsHtml(rows,mode){
     var html='',curDate=null;
     rows.forEach(function(x){
       if(x.slot_date!==curDate){if(curDate!==null)html+='</div>';curDate=x.slot_date;
@@ -206,13 +237,34 @@
       }
       var isB=x.kind==='block',cx=(x.status==='cancelled');
       var who=isB?'<b>Blocked — walk-in</b>':'<b>'+esc(x.name)+'</b><div class="meta">'+esc(x.phone)+(x.rig?' · '+esc(x.rig):'')+(x.note?' · '+esc(x.note):'')+(x.ref?' · '+esc(x.ref):'')+'</div>';
-      var label=(isB?'Block':esc(x.name))+' '+fmtHour(x.slot_hour)+' Bay '+x.bay;
-      var act=showAct?'<div class="act"><button class="btn ghost sm" onclick="cancelBk(\''+x.id+'\',\''+label.replace(/'/g,'')+'\')"><span>'+(isB?'Unblock':'Cancel')+'</span></button></div>':'<div class="act"><span class="mono" style="font-size:11px;color:var(--muted-2)">'+(cx?'cancelled':'done')+'</span></div>';
+      var label=(isB?'Block':esc(x.name))+' '+fmtHour(x.slot_hour)+' Bay '+x.bay,lid=label.replace(/'/g,'');
+      var act='<div class="act">';
+      if(mode==='upcoming'){
+        if(!isB)act+= x.paid ? '<span class="paid">✓ '+money(x.amount)+'</span>'
+                             : '<button class="btn ghost sm" onclick="markPaid(\''+x.id+'\',\''+lid+'\')"><span>Mark paid</span></button>';
+        act+='<button class="btn ghost sm" onclick="cancelBk(\''+x.id+'\',\''+lid+'\')"><span>'+(isB?'Unblock':'Cancel')+'</span></button>';
+      }else if(mode==='paid'){
+        act+='<span class="paid">'+money(x.amount)+'</span><button class="btn ghost sm" onclick="unmarkPaid(\''+x.id+'\')"><span>Undo</span></button>';
+      }else{
+        act+='<span class="mono" style="font-size:11px;color:var(--muted-2)">'+(cx?'cancelled':(x.paid?'paid '+money(x.amount):'done'))+'</span>';
+      }
+      act+='</div>';
       html+='<div class="bk'+(isB?' block':'')+'" style="'+(cx?'opacity:.5':'')+'"><span class="t">'+fmtHour(x.slot_hour)+'</span><span class="bay">Bay '+x.bay+'</span><div class="who">'+who+'</div>'+act+'</div>';
     });
     if(curDate!==null)html+='</div>';
     return html;
   }
+
+  // ---- tabs ----
+  var curTab='upcoming';
+  window.switchTab=function(t){
+    curTab=t;
+    document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===t);});
+    document.getElementById('paidTotals').style.display=(t==='paid')?'':'none';
+    document.getElementById('list').innerHTML='<div class="empty">Loading…</div>';
+    if(t==='upcoming')loadBookings();else if(t==='paid')loadPaid();else loadHistory();
+  };
+  window.refreshTab=function(){switchTab(curTab);};
 
   window.loadBookings=function(){
     var today=iso(new Date());
@@ -225,26 +277,31 @@
       document.getElementById('stToday').textContent=rows.filter(function(x){return x.slot_date===today;}).length;
       document.getElementById('stWeek').textContent=rows.filter(function(x){return x.slot_date<=wk;}).length;
       document.getElementById('stTotal').textContent=rows.length;
-      list.innerHTML=rows.length?rowsHtml(rows,true):'<div class="empty">No upcoming bookings yet.</div>';
+      if(curTab==='upcoming')list.innerHTML=rows.length?rowsHtml(rows,'upcoming'):'<div class="empty">No upcoming bookings yet.</div>';
     });
   };
 
-  var histShown=false;
-  window.toggleHistory=function(){
-    var el=document.getElementById('histList'),btn=document.getElementById('histBtn').querySelector('span');
-    histShown=!histShown;
-    el.style.display=histShown?'':'none';btn.textContent=histShown?'Hide history':'Show history';
-    if(histShown)loadHistory();
-  };
-  function loadHistory(){
-    var today=iso(new Date()),el=document.getElementById('histList');
-    el.innerHTML='<div class="empty">Loading…</div>';
-    // past (already happened) OR cancelled — owner-only view
-    db.from('bookings').select('*').or('slot_date.lt.'+today+',status.eq.cancelled').order('slot_date',{ascending:false}).order('slot_hour').limit(200)
+  function loadPaid(){
+    var list=document.getElementById('list'),tot=document.getElementById('paidTotals');
+    db.from('bookings').select('*').eq('paid',true).order('slot_date',{ascending:false}).order('slot_hour').limit(300)
     .then(function(r){
-      if(r.error){el.innerHTML='<div class="empty">Error: '+esc(r.error.message)+'</div>';return;}
+      if(r.error){tot.innerHTML='';list.innerHTML='<div class="empty">'+(/column|paid|amount/i.test(r.error.message)?'Run db/payments.sql in Supabase first (adds the payment columns).':'Error: '+esc(r.error.message))+'</div>';return;}
+      var rows=r.data||[],today=iso(new Date()),wk=iso(new Date(Date.now()-6*86400000));
+      function sum(f){return rows.filter(f).reduce(function(a,x){return a+(+x.amount||0);},0);}
+      tot.innerHTML='<div class="pt">Today<b>'+money(sum(function(x){return (x.paid_at||'').slice(0,10)===today;}))+'</b></div>'+
+        '<div class="pt">Last 7 days<b>'+money(sum(function(x){return (x.paid_at||'').slice(0,10)>=wk;}))+'</b></div>'+
+        '<div class="pt">All time<b>'+money(sum(function(){return true;}))+'</b></div>';
+      list.innerHTML=rows.length?rowsHtml(rows,'paid'):'<div class="empty">No paid jobs yet — hit “Mark paid” on a booking.</div>';
+    });
+  }
+
+  function loadHistory(){
+    var today=iso(new Date()),list=document.getElementById('list');
+    db.from('bookings').select('*').or('slot_date.lt.'+today+',status.eq.cancelled').order('slot_date',{ascending:false}).order('slot_hour').limit(300)
+    .then(function(r){
+      if(r.error){list.innerHTML='<div class="empty">Error: '+esc(r.error.message)+'</div>';return;}
       var rows=r.data||[];
-      el.innerHTML=rows.length?rowsHtml(rows,false):'<div class="empty">No history yet.</div>';
+      list.innerHTML=rows.length?rowsHtml(rows,'history'):'<div class="empty">No history yet.</div>';
     });
   }
 
