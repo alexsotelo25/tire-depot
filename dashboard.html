@@ -142,6 +142,11 @@
     <div id="paidTotals" class="paidtotals" style="display:none"></div>
     <div id="list"><div class="empty">Loading…</div></div>
   </div>
+
+  <div class="card">
+    <div class="card-h"><h2>Mobile requests</h2><button class="btn ghost sm" onclick="loadMobile()"><span>Refresh</span></button></div>
+    <div id="mobList"><div class="empty">Loading…</div></div>
+  </div>
 </div>
 
 <script>
@@ -181,8 +186,28 @@
   function enterDash(){
     document.getElementById('whoami').textContent=(role==='admin'?'Admin':'Owner');
     document.getElementById('shopLink').style.display='';
-    show('dash');loadBookings();
+    show('dash');loadBookings();loadMobile();
   }
+  window.loadMobile=function(){
+    var el=document.getElementById('mobList');
+    db.from('mobile_requests').select('*').in('status',['new','dispatched']).order('created_at',{ascending:false}).limit(100)
+    .then(function(r){
+      if(r.error){el.innerHTML='<div class="empty">'+(/relation|exist|mobile_requests/i.test(r.error.message)?'Run db/mobile.sql in Supabase to enable mobile requests.':'Error: '+esc(r.error.message))+'</div>';return;}
+      var rows=r.data||[];
+      if(!rows.length){el.innerHTML='<div class="empty">No mobile requests right now.</div>';return;}
+      var html='';
+      rows.forEach(function(x){
+        var isNew=x.status==='new',tag=isNew?' <span class="paid" style="color:var(--amber)">NEW</span>':' <span class="mono" style="font-size:11px;color:var(--muted-2)">dispatched</span>';
+        html+='<div class="bk" style="grid-template-columns:1fr auto;border-top:1px solid var(--line)"><div class="who"><b>'+esc(x.name||'—')+tag+'</b><div class="meta">'+esc(x.phone||'')+' · '+esc(x.area||'')+(x.location?' — '+esc(x.location):'')+(x.rig?' · '+esc(x.rig):'')+'</div>'+(x.need?'<div class="meta">“'+esc(x.need)+'”</div>':'')+'<div class="meta">'+esc(x.ref||'')+'</div></div><div class="act">'+(isNew?'<button class="btn ghost sm" onclick="markMobile(\''+x.id+'\',\'dispatched\')"><span>Dispatched</span></button>':'')+'<button class="btn ghost sm" onclick="markMobile(\''+x.id+'\',\'done\')"><span>Done</span></button></div></div>';
+      });
+      el.innerHTML=html;
+    });
+  };
+  window.markMobile=function(id,status){
+    db.from('mobile_requests').update({status:status}).eq('id',id).then(function(r){
+      if(r.error){alert('Could not update: '+r.error.message);return;}loadMobile();
+    });
+  };
 
   window.doLogin=function(){
     var email=document.getElementById('email').value.trim(),pass=document.getElementById('pass').value,m=document.getElementById('loginMsg');

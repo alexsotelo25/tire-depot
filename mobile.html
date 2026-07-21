@@ -169,24 +169,31 @@
           </div>
           <button class="btn btn-red cta locked" id="cta" onclick="dispatchIt()"><span>Add location first</span></button>
           <div class="sqr"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg> Secure $50 deposit via Square</div>
-          <div class="fine">Demo — no real charge. Live Square checkout wired on build.</div>
+          <div class="fine">Card handled securely by Square. The rest is charged once the work's done.</div>
         </div>
         <div class="success" id="success">
           <div class="check"><svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5 11-11" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Truck dispatched</h3>
-          <p id="sLine">We'll call to confirm and roll out.</p>
+          <h3>Request logged</h3>
+          <p id="sLine">Pay the $50 deposit and we'll roll a truck to you.</p>
           <div class="ref"><div class="k">Dispatch ref</div><div class="code" id="sRef">MD-0000</div></div>
-          <button class="btn btn-red cta" style="margin-top:0" onclick="location.href='index.html'"><span>Back to site</span></button>
+          <a class="btn btn-red cta" id="payBtn" style="margin-top:0" href="#" target="_blank" rel="noopener"><span>Pay $50 deposit →</span></a>
+          <div class="fine" id="payNote" style="margin-top:10px">Secure checkout on Square. Your details are already with the shop.</div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="demo">Live demo · 60-mile check &amp; $50 Square deposit are simulated. Real Maps distance + Square checkout wired on build.</div>
+<div class="demo">Distances are approximate. The $50 deposit is a live Square checkout.</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
+  var SB_URL="https://kzoaguotyxdcutpegrkg.supabase.co";
+  var SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6b2FndW90eXhkY3V0cGVncmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNTMxMzYsImV4cCI6MjA5OTcyOTEzNn0.Wd9xKy1Z7o7sBZUUK6R3bpI4lz2neRdFV523sygguO0";
+  var db=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
+  // ↓↓↓ PASTE the Square hosted $50-deposit Payment Link URL here (from Square → Payment Links) ↓↓↓
+  var SQUARE_DEPOSIT_URL="__PASTE_SQUARE_50_DEPOSIT_LINK__";
   var LOCS=[
     {n:"San Elizario, TX",mi:10},{n:"Clint, TX",mi:12},{n:"Horizon City, TX",mi:14},{n:"Fabens, TX",mi:16},
     {n:"El Paso, TX",mi:18},{n:"Anthony, TX/NM",mi:25},{n:"Canutillo, TX",mi:28},{n:"Santa Teresa, NM",mi:30},
@@ -219,15 +226,28 @@
   function lockCta(lock,txt){var c=document.getElementById('cta');c.classList.toggle('locked',lock);c.querySelector('span').innerHTML=txt;}
   sel.addEventListener('change',update);
 
+  function goSuccess(ref,area){
+    document.getElementById('sRef').textContent=ref;
+    document.getElementById('sLine').textContent=area+' · pay the $50 deposit to send the truck';
+    var pb=document.getElementById('payBtn'),note=document.getElementById('payNote');
+    if(SQUARE_DEPOSIT_URL && SQUARE_DEPOSIT_URL.indexOf('__')!==0){pb.href=SQUARE_DEPOSIT_URL;}
+    else{pb.removeAttribute('href');pb.classList.add('locked');pb.querySelector('span').textContent='Deposit link coming';note.textContent='Your details are with the shop — they’ll reach out to take the deposit.';}
+    document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
+  }
   window.dispatchIt=function(){
     if(!inRange)return;
-    var nm=document.getElementById('fName').value.trim(),ph=document.getElementById('fPhone').value.trim(),need=document.getElementById('fNeed').value.trim();
     function flash(id){var e=document.getElementById(id);e.focus();e.style.borderColor='var(--red-hot)';setTimeout(function(){e.style.borderColor='';},1200);}
-    if(!nm){flash('fName');return;}if(!ph){flash('fPhone');return;}if(!need){flash('fNeed');return;}
-    var ref='MD-'+String(Math.floor((+sel.value+1)*137)%9000+1000);
-    document.getElementById('sRef').textContent=ref;
-    document.getElementById('sLine').textContent=LOCS[+sel.value].n+' · $50 deposit held · balance at site or shop';
-    document.getElementById('main').style.display='none';document.getElementById('success').classList.add('show');
+    var area=LOCS[+sel.value].n,loc=document.getElementById('addr').value.trim();
+    var nm=document.getElementById('fName').value.trim(),ph=document.getElementById('fPhone').value.trim();
+    var rig=document.getElementById('fRig').value.trim(),need=document.getElementById('fNeed').value.trim();
+    if(!loc){flash('addr');return;}if(!nm){flash('fName');return;}if(!ph){flash('fPhone');return;}if(!need){flash('fNeed');return;}
+    var c=document.getElementById('cta');lockCta(true,'Sending…');
+    if(!db){goSuccess('MD-'+(String(Math.floor((+sel.value+1)*137)%9000+1000)),area);return;}
+    db.rpc('create_mobile_request',{p_area:area,p_location:loc,p_name:nm,p_phone:ph,p_rig:rig,p_need:need}).then(function(r){
+      lockCta(false,'Pay $50 &amp; Dispatch →');
+      if(r.error||!(r.data&&r.data.ok)){alert('Could not send request: '+((r.data&&r.data.error)||(r.error&&r.error.message)||'please try again'));return;}
+      goSuccess(r.data.ref,area);
+    });
   };
 })();
 </script>
