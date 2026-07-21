@@ -17,9 +17,14 @@ create table if not exists public.mobile_requests (
   phone      text,
   rig        text,
   need       text,
+  lat        numeric,
+  lng        numeric,
   ref        text,
   status     text not null default 'new' check (status in ('new','dispatched','done','cancelled'))
 );
+-- (safe if the table already exists from an earlier run)
+alter table public.mobile_requests add column if not exists lat numeric;
+alter table public.mobile_requests add column if not exists lng numeric;
 alter table public.mobile_requests enable row level security;
 
 -- staff read; owner/admin manage; public NEVER reads directly
@@ -38,7 +43,8 @@ create policy "owner delete mobile" on public.mobile_requests
 -- the public site calls ONLY this function to log a request
 create or replace function public.create_mobile_request(
   p_area text, p_location text, p_name text, p_phone text,
-  p_rig text default null, p_need text default null
+  p_rig text default null, p_need text default null,
+  p_lat numeric default null, p_lng numeric default null
 ) returns json
 language plpgsql security definer set search_path = public as $$
 declare v_ref text; v_id uuid;
@@ -48,12 +54,12 @@ begin
     return json_build_object('ok', false, 'error', 'Name, phone and location are required');
   end if;
   v_ref := 'MD-' || lpad((floor(random()*9000)+1000)::int::text, 4, '0');
-  insert into public.mobile_requests (area, location, name, phone, rig, need, ref)
+  insert into public.mobile_requests (area, location, name, phone, rig, need, lat, lng, ref)
   values (nullif(trim(coalesce(p_area,'')),''), trim(p_location), trim(p_name), trim(p_phone),
-          nullif(trim(coalesce(p_rig,'')),''), nullif(trim(coalesce(p_need,'')),''), v_ref)
+          nullif(trim(coalesce(p_rig,'')),''), nullif(trim(coalesce(p_need,'')),''), p_lat, p_lng, v_ref)
   returning id into v_id;
   return json_build_object('ok', true, 'ref', v_ref, 'id', v_id);
 end;
 $$;
 
-grant execute on function public.create_mobile_request(text,text,text,text,text,text) to anon, authenticated;
+grant execute on function public.create_mobile_request(text,text,text,text,text,text,numeric,numeric) to anon, authenticated;

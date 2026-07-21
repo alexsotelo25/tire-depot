@@ -94,6 +94,12 @@
   .deposit .lbl{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--steel)}
   .deposit .amt{font-family:var(--disp);font-style:italic;font-weight:900;font-size:34px;color:#fff;line-height:1}
   .deposit .sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.5}
+  .geowrap{margin-top:10px}
+  .geobtn{width:100%;justify-content:center;background:rgba(255,255,255,.04);border:1.5px solid var(--line-2);color:var(--white)}
+  .geobtn:hover{border-color:var(--red);color:var(--red);background:transparent}
+  .geo-status{font-family:var(--mono);font-size:12px;margin-top:8px;min-height:14px;color:var(--muted)}
+  .geo-status.ok{color:var(--green)}
+  .geo-status a{color:var(--red)}
   .cta{width:100%;justify-content:center;font-size:15px;padding:16px;margin-top:16px}
   .fine{font-family:var(--mono);font-size:11px;color:var(--muted-2);text-align:center;margin-top:10px;line-height:1.5}
   .sqr{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--mono);font-size:11px;color:var(--muted-2);margin-top:10px}
@@ -138,6 +144,10 @@
         <div class="field">
           <label for="addr">Exact location <span class="opt">(address, mile marker, or yard)</span></label>
           <input id="addr" placeholder="I-10 EB mile 34 · or 1600 Yard Rd">
+          <div class="geowrap">
+            <button type="button" class="btn geobtn" id="geoBtn" onclick="shareLoc()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.5 7-11a7 7 0 10-14 0c0 4.5 7 11 7 11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.4" fill="currentColor"/></svg><span>Use my current location</span></button>
+            <div class="geo-status" id="geoStatus"></div>
+          </div>
         </div>
         <div class="rangebox" id="range"><span class="ic" id="rangeIc"></span><div class="t" id="rangeT"></div></div>
 
@@ -201,6 +211,20 @@
     {n:"Alamogordo, NM",mi:90},{n:"Van Horn, TX",mi:100},{n:"Deming, NM",mi:110}
   ];
   var RADIUS=60,inRange=false;
+  var GEO={lat:null,lng:null};
+  window.shareLoc=function(){
+    var s=document.getElementById('geoStatus'),b=document.getElementById('geoBtn');
+    if(!navigator.geolocation){s.className='geo-status';s.textContent='Location not supported here — type the address above.';return;}
+    s.className='geo-status';s.textContent='Getting your location…';b.disabled=true;
+    navigator.geolocation.getCurrentPosition(function(p){
+      GEO.lat=+p.coords.latitude.toFixed(6);GEO.lng=+p.coords.longitude.toFixed(6);
+      b.disabled=false;s.className='geo-status ok';
+      s.innerHTML='✓ Location pinned · <a href="https://maps.google.com/?q='+GEO.lat+','+GEO.lng+'" target="_blank" rel="noopener">view pin ↗</a>';
+      var a=document.getElementById('addr');if(!a.value)a.value='Pinned GPS ('+GEO.lat+', '+GEO.lng+')';
+    },function(err){
+      b.disabled=false;s.className='geo-status';s.textContent="Couldn't get location ("+(err.code===1?'permission denied':'try again')+') — type the address instead.';
+    },{enableHighAccuracy:true,timeout:10000,maximumAge:0});
+  };
   var sel=document.getElementById('loc');
   LOCS.forEach(function(l,i){var o=document.createElement('option');o.value=i;o.textContent=l.n+" — "+l.mi+" mi";sel.appendChild(o);});
 
@@ -243,7 +267,7 @@
     if(!loc){flash('addr');return;}if(!nm){flash('fName');return;}if(!ph){flash('fPhone');return;}if(!need){flash('fNeed');return;}
     var c=document.getElementById('cta');lockCta(true,'Sending…');
     if(!db){goSuccess('MD-'+(String(Math.floor((+sel.value+1)*137)%9000+1000)),area);return;}
-    db.rpc('create_mobile_request',{p_area:area,p_location:loc,p_name:nm,p_phone:ph,p_rig:rig,p_need:need}).then(function(r){
+    db.rpc('create_mobile_request',{p_area:area,p_location:loc,p_name:nm,p_phone:ph,p_rig:rig,p_need:need,p_lat:GEO.lat,p_lng:GEO.lng}).then(function(r){
       lockCta(false,'Pay $50 &amp; Dispatch →');
       if(r.error||!(r.data&&r.data.ok)){alert('Could not send request: '+((r.data&&r.data.error)||(r.error&&r.error.message)||'please try again'));return;}
       goSuccess(r.data.ref,area);

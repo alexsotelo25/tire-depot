@@ -178,7 +178,7 @@
       var html='';
       rows.forEach(function(x){
         var isNew=x.status==='new',tag=isNew?' <span class="paid" style="color:var(--amber)">NEW</span>':' <span class="mono" style="font-size:11px;color:var(--muted-2)">dispatched</span>';
-        html+='<div class="bk" style="grid-template-columns:1fr auto;border-top:1px solid var(--line)"><div class="who"><b>'+esc(x.name||'—')+tag+'</b><div class="meta">'+esc(x.phone||'')+' · '+esc(x.area||'')+(x.location?' — '+esc(x.location):'')+(x.rig?' · '+esc(x.rig):'')+'</div>'+(x.need?'<div class="meta">“'+esc(x.need)+'”</div>':'')+'<div class="meta">'+esc(x.ref||'')+'</div></div><div class="act">'+(isNew?'<button class="btn ghost sm" onclick="markMobile(\''+x.id+'\',\'dispatched\')"><span>Dispatched</span></button>':'')+'<button class="btn ghost sm" onclick="markMobile(\''+x.id+'\',\'done\')"><span>Done</span></button></div></div>';
+        html+='<div class="bk" style="grid-template-columns:1fr auto;border-top:1px solid var(--line)"><div class="who"><b>'+esc(x.name||'—')+tag+'</b><div class="meta">'+esc(x.phone||'')+' · '+esc(x.area||'')+(x.location?' — '+esc(x.location):'')+(x.rig?' · '+esc(x.rig):'')+'</div>'+(x.need?'<div class="meta">“'+esc(x.need)+'”</div>':'')+'<div class="meta">'+esc(x.ref||'')+'</div></div><div class="act">'+((x.lat&&x.lng)?'<a class="btn ghost sm" href="https://maps.google.com/?q='+x.lat+','+x.lng+'" target="_blank" rel="noopener"><span>Map ↗</span></a>':'')+(isNew?'<button class="btn ghost sm" onclick="markMobile(\''+x.id+'\',\'dispatched\')"><span>Dispatched</span></button>':'')+'<button class="btn ghost sm" onclick="markMobile(\''+x.id+'\',\'done\')"><span>Done</span></button></div></div>';
       });
       el.innerHTML=html;
     });
